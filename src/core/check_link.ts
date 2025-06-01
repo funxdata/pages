@@ -1,4 +1,3 @@
-import PagesRouterInfo  from "../types.ts";
 export default (route:any)=>{
   document.addEventListener("click", function (event:MouseEvent) {
         const target = (event.target as HTMLElement).closest("a");
