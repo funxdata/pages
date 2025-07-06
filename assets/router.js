@@ -13,7 +13,10 @@ var check_link_default = (route) => {
 //#region src/core/check_url.ts
 var check_url_default = (url_src) => {
 	const info = new URL(url_src);
-	if (info.origin != globalThis.location.origin) console.log("网站将跳转至其它网页:", url_src);
+	if (info.origin != globalThis.location.origin) {
+		globalThis.window.open(url_src, "_blank");
+		console.log("网站将跳转至其它网页:", url_src);
+	}
 	return info;
 };
 
@@ -35,7 +38,6 @@ var router_map_default = class {
 		if (this.before != void 0) await this.before();
 		if (this.hook != void 0) await this.hook();
 		if (this.after != void 0) await this.after();
-		this.hook();
 	}
 	async leave_handler() {
 		if (this.leave != void 0) await this.leave();

@@ -28,7 +28,7 @@ export default class {
         if(this.after!=undefined){
             await this.after()
         }
-        this.hook()
+        // this.hook()
     }
 
     // 执行离开后的方法
