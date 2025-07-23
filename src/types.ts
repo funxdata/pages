@@ -4,6 +4,7 @@ export type Route = {
   name: string
   path: string | RegExp
   handler: Handler
+  load_js:URL
   hooks: RouteHooksStorage
 }
 export type Handler = (match?: Match) => void
@@ -70,7 +71,7 @@ declare class PagesRouterInfo {
   routes: Route[]
   destroyed: boolean
   current: null | Match[]
-  on(f:string, hooks?: CallBackFn): Route
+  on(f:string, hooks: CallBackFn, load_js?: URL): Route
   off(f:string):void
 }
 
