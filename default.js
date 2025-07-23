@@ -1,0 +1,1 @@
+console.log("this is funxdata default pages info");
