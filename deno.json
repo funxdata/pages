@@ -1,12 +1,19 @@
 {
-    "name": "@dowell/pages",
-    "version": "0.0.1",
+    "name": "@funxdata/pages",
+    "version": "0.0.2",
     "license": "MIT",
     "nodeModulesDir": "auto",
     "exports": {
         "./router":"./types/router.ts",
         "./tpls":"./tpls/index.ts"
     },
+    "exclude": [
+    ".github",
+    "node_modules",
+    "index.html",
+    ".prettierrc",
+    "plugin"
+  ],
     "tasks": {
         "view": "deno run --allow-sys --allow-net --allow-read  --allow-run --allow-env --allow-ffi jsr:@dowell/toolkit/view",
         "pack":"deno run --allow-net --allow-read --allow-env --allow-ffi --allow-run jsr:@dowell/toolkit/pack"
