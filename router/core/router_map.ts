@@ -1,5 +1,5 @@
 // 定义路由表
-import { CallBackFn} from "../types.ts"
+import { CallBackFn} from "../../types/router.ts"
 const DEFAULT_JS_URL = new URL("https://static.funxdata.com/default.js");
 export default class {
     path:string;

@@ -1,5 +1,5 @@
 import {Match,Route, RouteHooks, QContext, NavigateOptions, ResolveOptions,
-   GenerateOptions, Handler, RouterOptions, CallBackFn } from "./types.ts";
+   GenerateOptions, Handler, RouterOptions, CallBackFn } from "../types/router.ts";
 import check_link from "./core/check_link.ts"
 import check_url from "./core/check_url.ts";
 import router from "./core/router_map.ts"

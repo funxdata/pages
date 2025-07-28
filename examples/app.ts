@@ -1,5 +1,5 @@
     
-    import PagesRouter  from "../src/types.ts";
+    import PagesRouter  from "../types/router.ts";
     declare const GlobalPagesRouter: PagesRouter;
     GlobalPagesRouter.on("/home",async function(){
         console.log("hello home")
