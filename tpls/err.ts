@@ -21,8 +21,9 @@ export class TplRuntimeError extends TplError {
 
 export class TplFileResolutionError extends TplError {
   constructor(message: string) {
-    super(message);
+    super(`Could not find template at path: ${message}`);
     this.name = "TplFileResolution Error";
+    this.message = message;
   }
 }
 

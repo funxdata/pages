@@ -11,18 +11,38 @@ import {
 } from "./render.ts";
 import { TplError, RuntimeErr } from "./err.ts";
 import { TemplateFunction } from "./compile.ts";
+import * as path from "@std/path"
 
 /* TYPES */
 import type { TplConfig, Options } from "./config.ts";
 /* END TYPES */
 
 export class Tpl {
-  constructor(customConfig?: Partial<TplConfig>) {
-    if (customConfig) {
-      this.config = { ...defaultConfig, ...customConfig };
-    } else {
-      this.config = { ...defaultConfig };
+   constructor(customConfig: Partial<TplConfig>) {
+    if (!customConfig?.views) {
+      throw new Error(`Missing required config option: "views"`);
     }
+
+    const viewsPath = customConfig.views;
+
+    // Check if the directory exists and convert to absolute
+    const absViews = path.isAbsolute(viewsPath)
+      ? viewsPath
+      : path.resolve(Deno.cwd(), viewsPath);
+
+    try {
+      const stat = Deno.statSync(absViews);
+      if (!stat.isDirectory) {
+        throw new Error(`The path '${absViews}' is not a directory`);
+      }
+    } catch {
+      throw new Error(`Template views directory does not exist: ${absViews}`);
+    }
+    this.config = {
+      ...defaultConfig,
+      ...customConfig,
+      views: absViews,
+    };
   }
 
   config: TplConfig;

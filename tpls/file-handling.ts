@@ -6,16 +6,16 @@ import type { Tpl as TplCore } from "./core.ts";
 import type { Options } from "./config.ts";
 /* END TYPES */
 
-export function readFile(this: TplCore, path: string): string {
+export function readFile(this: TplCore, abs_path: string): string {
   let text = "";
   try {
-    const res = Deno.readFileSync(path);
+    const res = Deno.readFileSync(abs_path);
     text = new TextDecoder().decode(res);
 
   // deno-lint-ignore no-explicit-any
   } catch (err: any) {
     if (err?.code === "ENOENT") {
-      throw new TplFileResolutionError(`Could not find template: ${path}`);
+      throw new TplFileResolutionError(abs_path);
     } else {
       throw err;
     }
