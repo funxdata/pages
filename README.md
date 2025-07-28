@@ -1,4 +1,4 @@
-### Web-PagesRouter
+### Web-Pages
 web route pages
 
 #### About
@@ -12,15 +12,3 @@ web route pages
     deno add jsr:@dowell/pages
 ```
 
-* 修改index.html
-
-```
-
-
-```
-
-* ts中使用
-
-```
-
-```
