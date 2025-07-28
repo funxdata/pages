@@ -5,7 +5,7 @@
     "nodeModulesDir": "auto",
     "exports": {
         "./router":"./types/router.ts",
-        "./tpls":"./tpls/router.ts"
+        "./tpls":"./tpls/index.ts"
     },
     "tasks": {
         "view": "deno run --allow-sys --allow-net --allow-read  --allow-run --allow-env --allow-ffi jsr:@dowell/toolkit/view",
