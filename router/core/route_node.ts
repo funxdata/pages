@@ -1,4 +1,4 @@
-import { CallBackFn} from "../types.ts"
+import { CallBackFn} from "@/types/router.ts"
 export default class RouteNode {
     node:string="";   // 节点名称
     child:RouteNode[]=[]; // 子节点

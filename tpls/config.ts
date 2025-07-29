@@ -77,7 +77,7 @@ export interface TplConfig {
   varName: string;
 
   /** Directory that contains templates */
-  views: string;
+  views?: string;
 
   defaultExtension?: string;
 }
@@ -103,7 +103,6 @@ const defaultConfig: TplConfig = {
   tags: ["<%", "%>"],
   useWith: false,
   varName: "it",
-   views:"./",
   defaultExtension: ".tpl",
 };
 

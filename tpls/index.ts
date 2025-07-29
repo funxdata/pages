@@ -14,3 +14,5 @@ export class Tpl extends TplCore {
 
   override resolvePath = resolvePath;
 }
+
+export const hello = "world";
