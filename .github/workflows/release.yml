@@ -20,7 +20,7 @@ jobs:
       
       # 3
       - name: deno pack router
-        run: deno task pack ./src/router.ts
+        run: deno task pack ./router/router.ts
 
       # 4
       - name: deno pack views
