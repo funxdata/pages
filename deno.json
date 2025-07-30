@@ -21,7 +21,7 @@
     },
     "imports": {
         "@/": "./",
-        "@funxdata/toolkit": "jsr:@funxdata/toolkit@^0.1.25",
+        "@funxdata/toolkit": "jsr:@funxdata/toolkit@^0.1.28",
         "@std/assert": "jsr:@std/assert@1",
         "@dowell/toolkit": "jsr:@dowell/toolkit@^0.1.20",
         "@std/path": "jsr:@std/path@^1.1.1"

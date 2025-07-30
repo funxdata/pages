@@ -32,4 +32,4 @@ jobs:
           AccessKey: ${{ secrets.AccessKey }}
           SecretAccessKey: ${{ secrets.SecretAccessKey }}
           UPX_SERVICENAME: ${{ secrets.UPX_SERVICENAME }}
-        run: deno task release ../assets ux/assets
+        run: deno task release ./assets ux/assets
