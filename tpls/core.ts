@@ -11,7 +11,6 @@ import {
 } from "./render.ts";
 import { TplError, RuntimeErr } from "./err.ts";
 import { TemplateFunction } from "./compile.ts";
-import * as path from "@std/path"
 
 /* TYPES */
 import type { TplConfig, Options } from "./config.ts";

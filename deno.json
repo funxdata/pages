@@ -1,11 +1,13 @@
 {
     "name": "@funxdata/pages",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "license": "MIT",
     "nodeModulesDir": "auto",
     "exports": {
         "./router":"./types/router.ts",
-        "./tpls":"./tpls/index.ts"
+        "./tpls":"./tpls/index.ts",
+        "./tplstype":"./types/tpls.ts",
+        "./routtype":"./tpls/router.ts"
     },
     "exclude": [
     ".github",
