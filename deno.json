@@ -1,6 +1,6 @@
 {
     "name": "@funxdata/pages",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "license": "MIT",
     "nodeModulesDir": "auto",
     "exports": {
@@ -15,11 +15,13 @@
     "plugin"
   ],
     "tasks": {
-        "view": "deno run --allow-sys --allow-net --allow-read  --allow-run --allow-env --allow-ffi jsr:@dowell/toolkit/view",
-        "pack":"deno run --allow-net --allow-read --allow-env --allow-ffi --allow-run jsr:@dowell/toolkit/pack"
+        "view": "deno run --allow-sys --allow-net --allow-read  --allow-run --allow-env --allow-ffi jsr:@funxdata/toolkit/view",
+        "pack":"deno run --allow-net --allow-read --allow-env --allow-ffi --allow-run jsr:@funxdata/toolkit/pack",
+        "release":"deno run --allow-net --allow-read  --allow-run --allow-ffi --allow-env --allow-sys jsr:@funxdata/toolkit/release"
     },
     "imports": {
         "@/": "./",
+        "@funxdata/toolkit": "jsr:@funxdata/toolkit@^0.1.25",
         "@std/assert": "jsr:@std/assert@1",
         "@dowell/toolkit": "jsr:@dowell/toolkit@^0.1.20",
         "@std/path": "jsr:@std/path@^1.1.1"

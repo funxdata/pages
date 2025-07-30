@@ -11,8 +11,5 @@ export { type TplConfig, type Options } from "./config.ts";
 
 export class Tpl extends TplCore {
   override readFile = readFile;
-
   override resolvePath = resolvePath;
 }
-
-export const hello = "world";

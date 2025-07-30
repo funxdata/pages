@@ -1,78 +1,64 @@
-import {Match,Route, RouteHooks, QContext, NavigateOptions, ResolveOptions,
+import { Match, Route, RouteHooks, QContext, NavigateOptions, ResolveOptions,
    GenerateOptions, Handler, RouterOptions, CallBackFn } from "../types/router.ts";
+
 import check_link from "./core/check_link.ts"
 import check_url from "./core/check_url.ts";
 import router from "./core/router_map.ts"
 import RouteNode from "./core/route_node.ts";
 import MatchRout from "./core/route_match.ts"
+
 class PagesRouterInfo {
-  routnode:RouteNode;
-  routers:router[] =[]
-  // 初始化路由表
-  constructor(){
-    // this.root = root;
-    // 开启所有点击事件阻止
+  routnode: RouteNode;
+  routers: router[] = [];
+
+  constructor() {
     this.watch_interface();
     this.routnode = new RouteNode("/");
   }
-  watch_interface(){
-   check_link(this)
+
+  watch_interface() {
+    check_link(this);
   }
-  // 绑定路由表
-  on(path: string,hooks: CallBackFn):router{
-    const rt = new router(path,hooks)
-    this.routers.push(rt)
+
+  on(path: string, hooks: CallBackFn): router {
+    const rt = new router(path, hooks);
+    this.routers.push(rt);
     return rt;
   }
-  // 添加路由表
-  private _on_routs(){
 
-  }
-  // 添加路由节点
-  private _on_rout_node(){
-
-  }
-  // 删除路由表
-  off(path: string):boolean{
-    if (this.routers===undefined){
-      return false;
-    }
-    for (let index = 0; index < this.routers.length; index++) {
-      if(this.routers[index].path ==path){
-        this.routers.splice(index,1)
-        return true
+  off(path: string): boolean {
+    if (!this.routers) return false;
+    for (let i = 0; i < this.routers.length; i++) {
+      if (this.routers[i].path === path) {
+        this.routers.splice(i, 1);
+        return true;
       }
-    } 
+    }
     return false;
   }
-  // 删除路由表
-  private _off_routs(){
 
-  }
-  // 删除路由节点
-  private _off_rout_node(){
-
-  }
-  // 页面跳转
-  navigate(redirt_url:string){
-    // 网站第一次加载
-    let info = check_url(redirt_url)
-    this._match(info.pathname)
-    this._pushState(redirt_url)
+  navigate(redirt_url: string) {
+    const info = check_url(redirt_url);
+    this._match(info.pathname);
+    this._pushState(redirt_url);
   }
 
-  // 执行路由匹配
-  private async _match(path:string){
-    await MatchRout(path.trim(),this.routers)
+  private async _match(path: string) {
+    await MatchRout(path.trim(), this.routers);
   }
-  // 更新网页
-  private _pushState(redirt_url:string){
+
+  private _pushState(redirt_url: string) {
     history.pushState(null, "", redirt_url);
-    // console.log("跳转至:",redirt_url)
-  } 
+  }
 }
-const GlobalPagesRouter = new PagesRouterInfo()
-const url = globalThis.location.href;
-document.addEventListener("DOMContentLoaded", function(){
-  GlobalPagesRouter.navigate(url)
-});
+
+// deno-lint-ignore no-explicit-any
+declare const globalThis:any;
+// 👇 立即执行函数避免代码被打包器移除
+(() => {
+  globalThis.GlobalPagesRouter = new PagesRouterInfo();
+  const url = globalThis.location.href;
+  document.addEventListener("DOMContentLoaded", function () {
+    globalThis.GlobalPagesRouter.navigate(url);
+  });
+})();

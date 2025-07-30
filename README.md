@@ -9,6 +9,6 @@ web route pages
 * 安装包
 
 ```
-    deno add jsr:@dowell/pages
+    deno add jsr:@funxdata/pages
 ```
 

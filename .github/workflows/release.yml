@@ -1,0 +1,35 @@
+name: pagesxrelease
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # 2
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+            deno-version: v2.x
+      
+      # 3
+      - name: deno pack router
+        run: deno task pack ./src/router.ts
+
+      # 4
+      - name: deno pack views
+        run: deno task pack ./tpls/browser.ts
+
+      # 5
+      - name: Upload files to Upyun
+        env:
+          AccessKey: ${{ secrets.AccessKey }}
+          SecretAccessKey: ${{ secrets.SecretAccessKey }}
+          UPX_SERVICENAME: ${{ secrets.UPX_SERVICENAME }}
+        run: deno task release ./assets ux/assets
