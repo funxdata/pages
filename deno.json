@@ -7,7 +7,7 @@
         "./router":"./types/router.ts",
         "./tpls":"./tpls/index.ts",
         "./tplstype":"./types/tpls.ts",
-        "./routtype":"./tpls/router.ts"
+        "./routtype":"./types/router.ts"
     },
     "exclude": [
     ".github",

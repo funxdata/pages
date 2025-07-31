@@ -1,78 +1,30 @@
-//  数据结构的格式化
-
-export type Route = {
-  name: string
-  path: string | RegExp
-  handler: Handler
-  load_js:URL
-  hooks: RouteHooksStorage
-}
-export type Handler = (match?: Match) => void
-export type Match = {
-  url: string
-  queryString: string
-  hashString: string
-  route: Route
-  data: { [key: string]: string } | null
-  params: { [key: string]: string } | null
-}
-// 回调方法的定义
 export type CallBackFn = ()=>Promise<void>;
-export type BeforeHook = (done: CallBackFn, match: Match) => void
-export type AfterHook = (match: Match) => void
-export type LeaveHook = (done: CallBackFn, match: Match | Match[]) => void
-export type AlreadyHook = (match: Match) => void
-export type RouteHooks = {
-  before?: BeforeHook
-  after?: AfterHook
-  leave?: LeaveHook
-  already?: AlreadyHook
+export type RouteMap= [Route]
+export type Route = {
+  pathname: string; // 路由地址  
+  loadjs?:string; // 需要加载js
+  hook?:CallBackFn;    // 正式的回调方法
+  already?: CallBackFn; // 执行前的方法
+  before?: CallBackFn; // 执行前执行的
+  after?: CallBackFn;  // 执行完的回调方法
+  leave?: CallBackFn;  // 页面离开时执行的方法
+  do_load():void;
 }
-export type RouteHooksStorage = {
-  before?: BeforeHook[]
-  after?: AfterHook[]
-  leave?: LeaveHook[]
-  already?: AlreadyHook[]
-}
-export type NavigateOptions = {
-  title?: string
-  stateObj?: Object
-  historyAPIMethod?: string
-  updateBrowserURL?: boolean
-  callHandler?: boolean
-  callHooks?: boolean
-  updateState?: boolean
-  force?: boolean
-  resolveOptions?: ResolveOptions
-}
-export type ResolveStrategy = 'ONE' | 'ALL'
-export type ResolveOptions = {
-  strategy?: ResolveStrategy
-  hash?: boolean
-  noMatchWarning?: boolean
-}
-export type QContext = {
-  currentLocationPath: string
-  to: string
-  instance: PagesRouterInfo
-  matches?: Match[]
-  match?: Match
-  navigateOptions?: NavigateOptions
-  resolveOptions?: ResolveOptions
-  notFoundHandled?: boolean
-}
-export type GenerateOptions = {
-  includeRoot: boolean
-}
-export type RouterOptions = ResolveOptions & { linksSelector?: string }
-declare class PagesRouterInfo {
-  constructor(options?: RouterOptions)
-  root: string
-  routes: Route[]
-  destroyed: boolean
-  current: null | Match[]
-  on(f:string, hooks: CallBackFn, load_js?: URL): Route
-  off(f:string):void
-}
+export type RouteNode = {
+  pathname: string;
+  children: RouteNode[];  // 可以有多个子节点
+  parent?: RouteNode;     // 可选：指向父节点，构建完整树
+  add_node(path: string): RouteNode;
+  search_node(path: string): RouteNode|undefined;
+  delete_node(path: string):boolean;
+};
 
-export default PagesRouterInfo
+export interface PagesRouterInfo {
+  nodes: RouteNode;
+  routers: RouteMap;
+  on(path: string): Route|null;
+  search(path:string): Route|null;
+  off(path: string): boolean;
+  navigate(path: string): void;
+  init(url?: string): void;
+}
