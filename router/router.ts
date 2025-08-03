@@ -19,14 +19,14 @@ class PagesRouter implements PagesRouterInfo {
   }
 
   // 绑定路由
-  on(path: string): Route|null {
+  on(path: string,title:string): Route|null {
     if(this.search(path)!=null){
       console.warn("Route path already exists")
       return null;
     }
     const rt = new Route(path);
     this.routers.push(rt);
-    this.nodes.add_node(path);
+    this.nodes.add_node(path,title);
     return rt;
   }
   // 删除路由

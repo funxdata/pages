@@ -10,32 +10,37 @@ const routerData =[
   {
     route:"/home",
     view_url:"/examples/load_js_a.ts",
-    name:"home"
+    name:"home",
+    title:"测试1"
   },
   {
     route:"/user",
     view_url:"/examples/load_js_b.ts",
-    name:"user"
+    name:"user",
+    title:"测试2"
   },
   {
     route:"/product",
     view_url:"",
-    name:"product"
+    name:"product",
+    title:"测试3"
   },
   {
     route:"/product/infos",
     view_url:"/examples/load_js_cc.ts",
-    name:"product/infos"
+    name:"product/infos",
+    title:"测试4"
   },
   {
     route:"/product/classify",
     view_url:"/examples/load_js_cc.ts",
-    name:"product/classify"
+    name:"product/classify",
+    title:"测试5"
   },
 ]
 for (let index = 0; index < routerData.length; index++) {
   const items = routerData[index];
-  const route = GlobalPagesRoute.on(items.route) as Route
+  const route = GlobalPagesRoute.on(items.route,items.title) as Route
   if(route.loadjs!=""&&route.loadjs!="default"){
     route.loadjs = items.view_url;
   }
@@ -48,3 +53,5 @@ const nav_html = await TplToHtml.renderString(menu_tpl, {
         menuitems:routerData
     });
 document_app.innerHTML = nav_html
+
+console.log(GlobalPagesRoute)

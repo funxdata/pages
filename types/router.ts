@@ -15,7 +15,7 @@ export type RouteNode = {
   children: RouteNode[];  // 可以有多个子节点
   title?:string;  // 节点名称
   parent?: RouteNode;     // 可选：指向父节点，构建完整树
-  add_node(path: string): RouteNode;
+  add_node(path: string,title:string): RouteNode;
   search_node(path: string): RouteNode|undefined;
   delete_node(path: string):boolean;
 };
@@ -23,7 +23,7 @@ export type RouteNode = {
 export interface PagesRouterInfo {
   nodes: RouteNode;
   routers: RouteMap;
-  on(path: string): Route|null;
+  on(path: string,title:string): Route|null;
   search(path:string): Route|null;
   off(path: string): boolean;
   navigate(path: string): void;

@@ -1,23 +1,30 @@
-import { RouteNode as RouteNodeType} from "@/types/router.ts";
+import type { RouteNode as RouteNodeType} from "@/types/router.ts";
 export class RouteNode implements RouteNodeType {
   pathname: string;
+  title?: string; // ✅ 新增 title 属性
   children: RouteNodeType[];
   parent?: RouteNodeType | undefined;
-  constructor(pathname:string,children:[]){
+  constructor(pathname:string,children:[], title?: string){
     this.pathname =pathname;
     this.children = children;
+    this.title = title;
   }
-  add_node(path: string): RouteNode {
+
+  add_node(path: string, title: string): RouteNode {
     const parts = path.split("/").filter(Boolean);
     // deno-lint-ignore no-this-alias
     let current: RouteNode = this;
-    for (const part of parts) {
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
       let next = current.children.find(c => c.pathname === part) as RouteNode;
+
       if (!next) {
-        next = new RouteNode(part,[]);
+        next = new RouteNode(part, [], i === parts.length - 1 ? title : undefined); // ✅ 设置 title 仅在最后一层
         next.parent = current;
         current.children.push(next);
       }
+
       current = next;
     }
 
