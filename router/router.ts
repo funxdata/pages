@@ -3,7 +3,7 @@ import { RouteNode } from "./core/route_node.ts";
 import { Route } from "./core/router_map.ts"
 import { WatchClickLink } from "./core/watch_click.ts"
 import { MatchRout } from "./core/match.ts"
-import { check_url } from "./core/check_url.ts"
+// import { check_url } from "./core/check_url.ts"
 // import { WatchPopState } from "./core/watch_pop.ts"
 
 class PagesRouter implements PagesRouterInfo {
@@ -16,7 +16,6 @@ class PagesRouter implements PagesRouterInfo {
     const router:Route = new Route("/");
     this.routers = [router]  
     WatchClickLink(this); // 处理点击事件
-    // WatchPopState(this); // 加载浏览器变化
   }
 
   // 绑定路由
@@ -44,9 +43,9 @@ class PagesRouter implements PagesRouterInfo {
     return false;
   }
   // 跳转
-  navigate(path: string): void {
-    this._match(path);
+  async navigate(path: string): Promise<void> {
     this._pushState(path);
+    await this._match(path);
   }
   search(path:string):Route|null{
     for (let index = 0; index < this.routers.length; index++) {
@@ -62,26 +61,16 @@ class PagesRouter implements PagesRouterInfo {
   init() {
     const curPath = globalThis.location.pathname;
     this._match(curPath);
-    // this.routers[0].do_load();
+    this.routers[0].do_load();
   }
   private _pushState(redirt_url: string) {
     history.pushState(null, "", redirt_url);
   }
   private async _match(path: string) {
     const curPath = globalThis.location.pathname;
-    // 刷新
-    if(curPath==path){
-      const cur_route = this.search(curPath);
-      if(cur_route==null){
-        console.warn("route no info");
-        return
-      }
-      cur_route.do_load();
-      return;
-    }
     const from = this.search(curPath);
-    const to = this.search(path) 
-    await MatchRout(from, to, this.nodes);
+    const to = this.search(path);
+    await MatchRout(this,from, to);
   }
 }
 // 初始化并挂载到globalThis
