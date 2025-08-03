@@ -13,6 +13,7 @@ export type Route = {
 export type RouteNode = {
   pathname: string;
   children: RouteNode[];  // 可以有多个子节点
+  title?:string;  // 节点名称
   parent?: RouteNode;     // 可选：指向父节点，构建完整树
   add_node(path: string): RouteNode;
   search_node(path: string): RouteNode|undefined;

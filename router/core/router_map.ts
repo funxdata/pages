@@ -2,6 +2,7 @@ import type { CallBackFn, Route as RouteType } from "@/types/router.ts";
 
 export class Route implements RouteType {
   pathname: string;
+  title?:string;  // 节点名称
   loadjs?: string;
   hook?: CallBackFn;
   already?: CallBackFn;
