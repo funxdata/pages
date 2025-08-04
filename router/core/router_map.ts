@@ -1,5 +1,6 @@
 import type { CallBackFn, Route as RouteType } from "@/types/router.ts";
-
+import { service_plugin } from "./service_plugin.ts";
+import { getPathLevel } from "./utils.ts"
 export class Route implements RouteType {
   pathname: string;
   title?:string;  // 节点名称
@@ -9,7 +10,6 @@ export class Route implements RouteType {
   before?: CallBackFn;
   after?: CallBackFn;
   leave?: CallBackFn;
-
   constructor(pathname: string) {
     this.pathname = pathname;
   }
@@ -18,6 +18,10 @@ export class Route implements RouteType {
       this.do_load_script();
     }else{
       this.do_load_fn();
+    }
+    // 二级目录加载
+    if(getPathLevel(this.pathname)>1){
+      service_plugin();
     }
   }
   do_load_fn(){
