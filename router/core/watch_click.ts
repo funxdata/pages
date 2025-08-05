@@ -22,7 +22,27 @@ export const WatchClickLink = (router: PagesRouterInfo) => {
         return;
       }
 
-      router.navigate(target.pathname + target.search);
+      // 只有路径
+      if (target.search==""||target.search==undefined){
+        router.navigate(target.pathname);
+      }else{
+        if(targetUrl.pathname === currentUrl.pathname){
+          const rt = router.search(targetUrl.pathname)
+          if(rt==null){
+            console.warn("loading route error");
+            return;
+          }
+          router.Pagination(rt,target.search)
+        }else{
+          router.navigate(target.pathname);
+          const rt = router.search(targetUrl.pathname)
+          if(rt==null){
+            console.warn("loading route error");
+            return;
+          }
+          router.Pagination(rt,target.search)
+        }
+      }
     }
   });
 };

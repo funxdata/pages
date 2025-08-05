@@ -10,6 +10,7 @@ export class Route implements RouteType {
   before?: CallBackFn;
   after?: CallBackFn;
   leave?: CallBackFn;
+  Pagination?:CallBackFn
   constructor(pathname: string) {
     this.pathname = pathname;
   }
@@ -60,6 +61,13 @@ export class Route implements RouteType {
     document.body.appendChild(script);
     if(this.hook!=null){
       this.hook();
+    }
+  }
+
+  // 加载分页方法
+  load_Pagination(){
+    if(this.Pagination!=null){
+      this.Pagination();
     }
   }
   

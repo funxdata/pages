@@ -8,7 +8,9 @@ export type Route = {
   before?: CallBackFn; // 执行前执行的
   after?: CallBackFn;  // 执行完的回调方法
   leave?: CallBackFn;  // 页面离开时执行的方法
+  Pagination?:CallBackFn
   do_load():void;
+  load_Pagination():void;
 }
 export type RouteNode = {
   pathname: string;
@@ -27,5 +29,6 @@ export interface PagesRouterInfo {
   search(path:string): Route|null;
   off(path: string): boolean;
   navigate(path: string): void;
+  Pagination(rt:Route,params:string):void;
   init(url?: string): void;
 }
