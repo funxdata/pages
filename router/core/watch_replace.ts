@@ -1,11 +1,11 @@
 //  监听url 变化
-import type { PagesRouterInfo } from "@/types/router.ts";
+import { PagesRouterInfo } from "@/types/router.ts";
 
-export const WatchPopState = (router: PagesRouterInfo) => {
+export const WatchReplaceState = (router: PagesRouterInfo) => {
   let lastPath = "";      // 记录上一次 pathname
   let lastSearch = "";    // 记录上一次 search 参数
 
-  globalThis.addEventListener("locationchange", () => {
+  globalThis.addEventListener("locationreplaceState", () => {
     const currentUrl = new URL(location.href);
 
     const currentPath = currentUrl.pathname;
@@ -14,7 +14,7 @@ export const WatchPopState = (router: PagesRouterInfo) => {
       return;
     }
     console.log(currentSearch)
-    console.log("logging pop state")
+    console.log("logging pop replace")
 
     // 如果路径和查询参数都没有变化，则不再处理
     if (currentPath === lastPath && currentSearch === lastSearch) {

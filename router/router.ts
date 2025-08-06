@@ -1,10 +1,11 @@
-import type { PagesRouterInfo,RouteMap } from "../types/router.ts";
+import type { PagesRouterInfo,RouteMap } from "@/types/router.ts";
 import { RouteNode } from "./core/route_node.ts";
 import { Route } from "./core/router_map.ts"
 import { WatchClickLink } from "./core/watch_click.ts"
 import { MatchRout } from "./core/match.ts"
 // import { check_url } from "./core/check_url.ts"
 import { WatchPopState } from "./core/watch_pop.ts"
+import { WatchReplaceState } from "./core/watch_replace.ts"
 
 class PagesRouter implements PagesRouterInfo {
   nodes: RouteNode;
@@ -17,6 +18,7 @@ class PagesRouter implements PagesRouterInfo {
     this.routers = [router]  
     WatchClickLink(this); // 处理点击事件
     WatchPopState(this);  // url 跳转事件
+    WatchReplaceState(this); // 替换事件
   }
 
   // 绑定路由
@@ -54,7 +56,7 @@ class PagesRouter implements PagesRouterInfo {
     const currentUrl = new URL(location.href);
     const param_url = currentUrl.pathname+params;
     this._pushState(param_url);
-    rt.load_Pagination();
+    // rt.load_Pagination();
   }
   search(path:string):Route|null{
     for (let index = 0; index < this.routers.length; index++) {
@@ -106,7 +108,7 @@ export const patchHistoryEvents = () => {
 
   history.replaceState = function (...args) {
     const result = rawReplaceState.apply(this, args);
-    globalThis.dispatchEvent(new Event("locationchange"));
+    globalThis.dispatchEvent(new Event("locationreplaceState"));
     return result;
   };
 
