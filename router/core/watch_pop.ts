@@ -1,5 +1,5 @@
 //  监听url 变化
-import type { PagesRouterInfo } from "@/types/router.ts";
+import { PagesRouterInfo } from "@/types/router.ts";
 
 export const WatchPopState = (router: PagesRouterInfo) => {
   let lastPath = "";      // 记录上一次 pathname
