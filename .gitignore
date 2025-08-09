@@ -136,3 +136,4 @@ dist
 .pnp.*
 deno.lock
 ./deno.lock
+html

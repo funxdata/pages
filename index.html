@@ -3,9 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <title>router test</title>
+    <link rel="stylesheet" href="https://static.funxdata.com/release/css/css-manage33031.css">
+  <link rel="stylesheet" href="https://static.funxdata.com/release/font20250304/icons.css">
 </head>
 <body>
+  <div>
+    <div class="tables-set row mb-8">
+  <div class="flex1 row align-center" id="tables-set-filter">
+    <a id="do_page_change" class="vg-btn btn-size-sm btn-type-brand mr-8">
+      改变分页
+    </a>
+    <div class="vg-searchs searchs-size-sm">
+        <div class="search-icons">
+            <i class="vg-icon ic-search"></i>
+        </div>
+        <input placeholder="搜索产品" required="" id="search_manage" type="text">
+    </div>
+</div>
+<div class="vg-paginations" id="tables-set-pagination">
+</div>
+</div>
+  </div>
   <div id="app"></div>
+  <div id="pages"></div>
 </body>
 <script type="module" src="/router/router.ts"></script>
 <script type="module" src="/tpls/browser.ts"></script>

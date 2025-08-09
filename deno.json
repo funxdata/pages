@@ -6,8 +6,10 @@
     "exports": {
         "./router":"./types/router.ts",
         "./tpls":"./tpls/index.ts",
+        "./tools":"./tools/index.ts",
         "./tplstype":"./types/tpls.ts",
-        "./routtype":"./types/router.ts"
+        "./routtype":"./types/router.ts",
+        "./toolstype":"./types/tools.ts"
     },
     "exclude": [
         ".github",
@@ -23,6 +25,8 @@
     },
     "imports": {
         "@/": "./",
+        "@funxdata/template/uicomps": "jsr:@funxdata/template@^0.1.5/uicomps",
+        "@funxdata/template": "jsr:@funxdata/template@^0.1.5",
         "@funxdata/toolkit": "jsr:@funxdata/toolkit@^0.1.30",
         "@std/assert": "jsr:@std/assert@1",
         "@std/path": "jsr:@std/path@^1.1.1"
