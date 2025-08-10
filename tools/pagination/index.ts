@@ -9,7 +9,7 @@ export const pagination = async (
   node: HTMLElement,
   cfg: paginationcfg,
   docallback: PaginationCallback
-) => {
+): Promise<void> => {
   // 内部状态用闭包变量保存，避免直接修改 cfg，且不破坏类型
   let _num = cfg.num;
   let _size = cfg.size;

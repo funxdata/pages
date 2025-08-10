@@ -25,8 +25,8 @@
     },
     "imports": {
         "@/": "./",
-        "@funxdata/template/uicomps": "jsr:@funxdata/template@^0.1.5/uicomps",
-        "@funxdata/template": "jsr:@funxdata/template@^0.1.5",
+        "@funxdata/template/uicomps": "jsr:@funxdata/template@^0.1.6/uicomps",
+        "@funxdata/template": "jsr:@funxdata/template@^0.1.6",
         "@funxdata/toolkit": "jsr:@funxdata/toolkit@^0.1.30",
         "@std/assert": "jsr:@std/assert@1",
         "@std/path": "jsr:@std/path@^1.1.1"
