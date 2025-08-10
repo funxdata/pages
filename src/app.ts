@@ -46,7 +46,6 @@ for (let index = 0; index < routerData.length; index++) {
   if(route.loadjs!=""&&route.loadjs!="default"){
     route.loadjs = items.view_url;
   }
-  
 }
 
 const document_app = document.getElementById("app") as HTMLElement;
@@ -62,13 +61,31 @@ const pagination_cfg:paginationtype.paginationcfg = {
   num: 1,
   total: 44
 }
-await pagination(pagination_node,pagination_cfg,(cfg:paginationtype.paginationcfg)=>{
-  console.log(cfg)
-  console.log("zzzzzzzz")
-})
-const page_id_change = document.getElementById("do_page_change") as HTMLElement;
-page_id_change.onclick= ()=>{
-  // pgcfg.total = 11
-  pagination_cfg.total = 22;
+// await pagination(pagination_node,pagination_cfg,(cfg:paginationtype.paginationcfg)=>{
+//   console.log(cfg)
+// })
+
+const do_test_location = document_app.querySelector("#do_test_location") as HTMLElement;
+do_test_location.onclick = ()=>{
+  console.log("aaa")
+  globalThis.location.href ="/home/test"
 }
-console.log(GlobalPagesRoute)
+
+
+const do_test_replace = document_app.querySelector("#do_test_replace") as HTMLElement;
+do_test_replace.onclick = ()=>{
+  history.replaceState(null, "", "/home/replacepop");
+  // globalThis.location.href ="/home/replace"
+}
+
+const do_test_pop = document_app.querySelector("#do_test_pop") as HTMLElement;
+do_test_pop.onclick = ()=>{
+  history.pushState(null, "", "/home/pop");
+}
+
+// const page_id_change = document.getElementById("do_page_change") as HTMLElement;
+// page_id_change.onclick= ()=>{
+//   // pgcfg.total = 11
+//   pagination_cfg.total = 22;
+// }
+GlobalPagesRoute.init();

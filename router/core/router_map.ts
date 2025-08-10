@@ -11,8 +11,10 @@ export class Route implements RouteType {
   after?: CallBackFn;
   leave?: CallBackFn;
   Pagination?:CallBackFn
+  is_history:number;
   constructor(pathname: string) {
     this.pathname = pathname;
+    this.is_history = 1;
   }
   do_load(){
     if(this.loadjs!=null){

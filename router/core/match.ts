@@ -1,25 +1,35 @@
-import type { Route, PagesRouterInfo } from "@/types/router.ts"
-export const MatchRout=(routes:PagesRouterInfo,from:Route|null,to:Route|null)=>{
-  if(to==null||from==null){
-    console.warn("Route path no exists");
-    return;
+import type { Route, PagesRouterInfo,RouteNode } from "@/types/router.ts"
+
+export const MatchRoute = (
+  routes: PagesRouterInfo,
+  cur_url: URL
+): Route | null => {
+  const cur_route = routes.search(cur_url.pathname);
+  if (cur_route == null) {
+    console.warn("router is not found");
+    return null;
   }
-  if(from.leave!=null){
-    from.leave();
+
+  // 查找对应的节点
+  const router_node = routes.nodes.search_node(cur_url.pathname) as RouteNode | null;
+  if (!router_node) {
+    console.warn("router node is not found");
+    return null;
   }
-  const segments = to.pathname.split("/").filter(Boolean);
-  // 一级目录没有内容,直接跳转至二级页面
-  if((segments.length<2&&to.loadjs==null)||(segments.length<2&&to.loadjs=="")){
-    // 跳转至子目录
-    const router_nodes = routes.nodes.search_node(to.pathname);
-    if(router_nodes==undefined){
-      console.warn("not found page");
-      return;
+
+  const segments = cur_url.pathname.split("/").filter(Boolean);
+
+  // 一级目录特殊处理：当只有一级目录且 loadjs 未定义时，返回拼接路径字符串
+  if (segments.length === 1 && cur_route.loadjs === undefined) {
+    const child = router_node.children?.[0];
+    if (child) {
+      return routes.search(`${cur_url.pathname}/${child.pathname}`);
+    } else {
+      console.warn("No child route found for the node");
+      return null;
     }
-    // 跳转至子目录的一级目录
-    const redirt_path = "/"+router_nodes.pathname+"/"+router_nodes.children[0].pathname;
-    routes.navigate(redirt_path);
-    return;
   }
-  to.do_load();
-}
+
+  // 默认返回当前路由
+  return cur_route;
+};
