@@ -3,17 +3,8 @@
 import type { PagesRouterInfo,HistoryStateArgs } from "@/types/router.ts";
 
 export const WatchPushState = (router: PagesRouterInfo,evt:HistoryStateArgs) => {
-    //   router.replace(href.toString())
-
     if(evt[0]!=null&&evt[0].sys){
         return;
     }
-    console.log("pushstate   evt",evt);
-    // try{
-    //     if(evt[0].sys){
-    //         return;
-    //     }
-    // } catch {
-    //     console.log("pushstate   evt",evt);
-    // }
+    router.replace(evt[2] as string);
 };

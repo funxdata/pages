@@ -2,14 +2,17 @@ import type { PagesRouterInfo,RouteMap } from "@/types/router.ts";
 import { RouteNode } from "./core/route_node.ts";
 import { Route } from "./core/router_map.ts"
 import { MatchRoute } from "./core/match.ts"
+import { is_only_Pagination } from "./core/check_url.ts"
 export class PagesRouter implements PagesRouterInfo {
   nodes: RouteNode;
   routers: RouteMap;
+  private is_load:boolean;
   constructor() {
     const root = new RouteNode("/",[]);
     this.nodes = root;
     const router:Route = new Route("/");
     this.routers = [router];
+    this.is_load = true;
   }
 
   // 绑定路由
@@ -39,6 +42,7 @@ export class PagesRouter implements PagesRouterInfo {
   // 跳转
   // 需要记录到路由表中
   async navigate(redirt_url: string): Promise<void> {
+    const check_pg = is_only_Pagination(redirt_url)
     const to_url = new URL(redirt_url)
     const rt = this.search(to_url.pathname);
     if(rt == null||rt==undefined){
@@ -50,18 +54,33 @@ export class PagesRouter implements PagesRouterInfo {
     }else{
       this._replaceState(redirt_url);
     }
-    await this.loading(redirt_url);
+    if(check_pg&&!this.is_load){
+      await this.only_load_pagination(redirt_url);
+    }else{
+      await this._match_loading(redirt_url);
+    }
+    
   }
 
   // 替换
   // 不需要记录到路由表中
   async replace(redirt_url:string): Promise<void> {
+    const check_pg = is_only_Pagination(redirt_url)
     this._replaceState(redirt_url);
-    await this.loading(redirt_url);
+    if(check_pg){
+      await this.only_load_pagination(redirt_url);
+    }else{
+      await this._match_loading(redirt_url);
+    }
   }
 
   async loading(redirt_url:string): Promise<void> {
-    await this._match_loading(redirt_url);
+    const check_pg = is_only_Pagination(redirt_url)
+    if(check_pg){
+      await this.only_load_pagination(redirt_url);
+    }else{
+      await this._match_loading(redirt_url);
+    }
   }
   
   search(path:string):Route|null{
@@ -82,6 +101,7 @@ export class PagesRouter implements PagesRouterInfo {
     }else{
       this.navigate(path)
     }
+    this.is_load = false;
   }
   private _pushState(redirt_url: string) {
     history.pushState({sys:true}, "", redirt_url);
@@ -104,9 +124,20 @@ export class PagesRouter implements PagesRouterInfo {
       this.replace(cur_url.toString());
     }
     await rt.do_load();
-    await rt.load_Pagination();
+    if(cur_url.search!=null&&cur_url.search!=undefined&&cur_url.search!=""){
+      await rt.load_Pagination();
+    }
   }
 
+  private async only_load_pagination(to_url:string){
+    const cur_url = new URL(to_url);
+    const rt = MatchRoute(this,cur_url);
+    if(rt==null){
+      this.loading_404();
+      return;
+    }
+    await rt.load_Pagination();
+  }
   private loading_404= ()=>{
      console.warn("route not found");
   }

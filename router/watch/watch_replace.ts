@@ -7,5 +7,5 @@ export const WatchReplace = (router: PagesRouterInfo,evt:HistoryStateArgs) => {
   if(evt[0]!=null&&evt[0].sys){
     return;
   }
-  console.log("replacestate   evt",evt);
+  router.loading(evt[2] as string);
 };
