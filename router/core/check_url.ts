@@ -18,3 +18,17 @@ export const is_only_Pagination=(to:string):boolean=>{
     Boolean(to_url.search)
   );
 };
+
+export const safeURL = (url: string): URL | null=>{
+  /** 安全 URL 解析，支持相对路径 */
+    try {
+      if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url)) {
+        return new URL(url, globalThis.location.origin);
+      }
+      return new URL(url);
+    } catch (e) {
+      console.warn("Invalid URL:", url, e);
+      return null;
+    }
+  
+}
