@@ -48,20 +48,29 @@ export class PagesRouter implements PagesRouterInfo {
   }
 
   async navigate(redirt_url: string): Promise<void> {
-    const check_pg = is_only_Pagination(redirt_url);
-    const to_url = this.safeURL(redirt_url);
-    if (!to_url) return this.loading_404();
+      const check_pg = is_only_Pagination(redirt_url);
+      const to_url = this.safeURL(redirt_url);
+      if (!to_url) return this.loading_404();
 
-    const rt = this.search(to_url.pathname);
-    if (!rt) return this.loading_404();
+      // 先用 MatchRoute 匹配路由
+      const mrt = MatchRoute(this, to_url);
+      if (!mrt) return this.loading_404();
 
-    rt.is_history == 1 ? this._pushState(redirt_url) : this._replaceState(redirt_url);
+      // 再用 search 获取真正的 Route 实例（router_map.Route）
+      const rt = this.search(mrt.pathname);
+      if (!rt) return this.loading_404();
 
-    if (check_pg && !this.is_load) {
-      await this.only_load_pagination(rt);
-    } else {
-      await this._match_loading(rt, to_url, check_pg);
-    }
+      // 根据匹配结果决定 push/replace
+      rt.is_history === 1
+        ? this._pushState(redirt_url)
+        : this._replaceState(redirt_url);
+
+      // 分页或普通加载
+      if (check_pg && !this.is_load) {
+        await this.only_load_pagination(rt);
+      } else {
+        await this._match_loading(rt, to_url, check_pg);
+      }
   }
 
   async replace(redirt_url: string): Promise<void> {
