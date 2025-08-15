@@ -10,6 +10,9 @@ export class PagesRouter implements PagesRouterInfo {
   private routerMap: Map<string, Route>;
   private is_load: boolean;
 
+  // 分页加载状态
+  private isLoadingPagination = false;
+
   constructor() {
     const root = new RouteNode("/", []);
     this.nodes = root;
@@ -21,7 +24,6 @@ export class PagesRouter implements PagesRouterInfo {
     this.is_load = true;
   }
 
-  /** 绑定路由 */
   on(path: string, title: string): Route | null {
     if (this.search(path) != null) {
       console.warn("Route path already exists:", path);
@@ -34,7 +36,6 @@ export class PagesRouter implements PagesRouterInfo {
     return rt;
   }
 
-  /** 删除路由 */
   off(path: string): boolean {
     const idx = this.routers.findIndex(r => r.pathname === path);
     if (idx >= 0) {
@@ -46,125 +47,122 @@ export class PagesRouter implements PagesRouterInfo {
     return false;
   }
 
-  /** 跳转，需要记录到路由表中 */
   async navigate(redirt_url: string): Promise<void> {
     const check_pg = is_only_Pagination(redirt_url);
     const to_url = this.safeURL(redirt_url);
-    if (!to_url) {
-      this.loading_404();
-      return;
-    }
+    if (!to_url) return this.loading_404();
 
     const rt = this.search(to_url.pathname);
-    if (!rt) {
-      this.loading_404();
-      return;
-    }
+    if (!rt) return this.loading_404();
 
-    if (rt.is_history == 1) {
-      this._pushState(redirt_url);
-    } else {
-      this._replaceState(redirt_url);
-    }
+    rt.is_history == 1 ? this._pushState(redirt_url) : this._replaceState(redirt_url);
 
     if (check_pg && !this.is_load) {
-      await this.only_load_pagination(redirt_url);
+      await this.only_load_pagination(rt);
     } else {
-      await this._match_loading(redirt_url);
+      await this._match_loading(rt, to_url, check_pg);
     }
   }
 
-  /** 替换，不需要记录到路由表中 */
   async replace(redirt_url: string): Promise<void> {
     const check_pg = is_only_Pagination(redirt_url);
+    const to_url = this.safeURL(redirt_url);
+    if (!to_url) return this.loading_404();
+
     this._replaceState(redirt_url);
-    if (check_pg) {
-      await this.only_load_pagination(redirt_url);
+    const rt = this.search(to_url.pathname);
+    if (!rt) return this.loading_404();
+
+    if (check_pg && !this.is_load) {
+      await this.only_load_pagination(rt);
     } else {
-      await this._match_loading(redirt_url);
+      await this._match_loading(rt, to_url, check_pg);
     }
   }
 
-  /** 仅加载数据 */
   async loading(redirt_url: string): Promise<void> {
     const check_pg = is_only_Pagination(redirt_url);
+    const to_url = this.safeURL(redirt_url);
+    if (!to_url) return this.loading_404();
+
+    const rt = this.search(to_url.pathname);
+    if (!rt) return this.loading_404();
+
     if (check_pg) {
-      await this.only_load_pagination(redirt_url);
+      await this.only_load_pagination(rt);
     } else {
-      await this._match_loading(redirt_url);
+      await this._match_loading(rt, to_url, false);
     }
   }
 
-  /** 查找路由 */
   search(path: string): Route | null {
     return this.routerMap.get(path) ?? null;
   }
 
-  /** 初始化 */
   init(path: string) {
-    const target = path == null || path === "" ? globalThis.location.href : path;
+    const target = path || globalThis.location.href;
     this.navigate(target);
     this.is_load = false;
   }
 
-  /** pushState 封装 */
   private _pushState(redirt_url: string) {
     history.pushState({ sys: true }, "", redirt_url);
   }
 
-  /** replaceState 封装 */
   private _replaceState(redirt_url: string) {
     history.replaceState({ sys: true }, "", redirt_url);
   }
 
-  /** 路由匹配并加载 */
-  private async _match_loading(redirt_url: string) {
-    const cur_url = this.safeURL(redirt_url);
-    if (!cur_url) {
-      this.loading_404();
-      return;
-    }
-    const rt = MatchRoute(this, cur_url);
-    if (!rt) {
-      this.loading_404();
-      return;
-    }
+  private async _match_loading(rt: Route, cur_url: URL, skipPagination = false) {
     if (rt.pathname !== cur_url.pathname) {
       cur_url.pathname = rt.pathname;
-      this.replace(cur_url.toString());
+      if (cur_url.toString() !== location.href) {
+        this.replace(cur_url.toString());
+        return;
+      }
     }
-    await rt.do_load();
-    if (cur_url.search) {
+
+    try {
+      await rt.do_load();
+      if (!skipPagination && cur_url.search) {
+        await this.safe_load_Pagination(rt);
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("加载出错:", err.message);
+      } else {
+        console.error("未知错误:", err);
+      }
+    }
+  }
+
+  private async only_load_pagination(rt: Route) {
+    await this.safe_load_Pagination(rt);
+  }
+
+  /** 安全调用分页，防止重复执行 */
+  private async safe_load_Pagination(rt: Route) {
+    if (this.isLoadingPagination) return;
+    this.isLoadingPagination = true;
+
+    try {
       await rt.load_Pagination();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("分页加载出错:", err.message);
+      } else {
+        console.error("未知分页加载错误:", err);
+      }
+    } finally {
+      this.isLoadingPagination = false;
     }
   }
 
-  /** 仅加载分页数据 */
-  private async only_load_pagination(to_url: string) {
-    const cur_url = this.safeURL(to_url);
-    if (!cur_url) {
-      this.loading_404();
-      return;
-    }
-    const rt = MatchRoute(this, cur_url);
-    if (!rt) {
-      this.loading_404();
-      return;
-    }
-    await rt.load_Pagination();
-  }
+  private loading_404 = () => console.warn("route not found");
 
-  /** 404 回调 */
-  private loading_404 = () => {
-    console.warn("route not found");
-  };
-
-  /** 安全 URL 解析，支持相对路径 */
   private safeURL(url: string): URL | null {
     try {
-      if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url)) {
-        return new URL(url, globalThis.location.origin);
-      }
+      if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url)) return new URL(url, globalThis.location.origin);
       return new URL(url);
     } catch (e) {
       console.warn("Invalid URL:", url, e);
