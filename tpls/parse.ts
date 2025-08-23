@@ -1,20 +1,6 @@
 import { ParseErr } from "./err.ts";
 import { trimWS } from "./utils.ts";
-
-/* TYPES */
-
-import type { Tpl } from "./core.ts";
-
-export type TagType = "r" | "e" | "i" | "";
-
-export interface TemplateObject {
-  t: TagType;
-  val: string;
-  lineNo?: number;
-}
-
-export type AstObject = string | TemplateObject;
-
+import type { Tpl } from "./types/core.ts";
 /* END TYPES */
 
 const templateLitReg =
@@ -35,7 +21,7 @@ const getLineNo=(str: string, index: number)=> {
   return str.slice(0, index).split("\n").length;
 }
 
-export function parse(this: Tpl, str: string): Array<AstObject> {
+export const parse=(this: Tpl, str: string): Array<AstObject>=> {
   const config = this.config;
 
   let buffer: Array<AstObject> = [];

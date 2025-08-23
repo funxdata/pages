@@ -1,16 +1,14 @@
 import { TplNameResolutionError } from "./err.ts";
 
 /* TYPES */
-import type { Options } from "./config.ts";
-import type { TemplateFunction } from "./compile.ts";
+import type { Options } from "./types/config.ts";
+
+import type { TemplateFunction } from "./types/compile.ts";
+
 import type { Tpl } from "./core.ts";
 /* END TYPES */
 
-function handleCache(
-  this: Tpl,
-  template: string,
-  options: Partial<Options>,
-): TemplateFunction {
+const handleCache=( template: string,options: Partial<Options>): TemplateFunction =>{
   const templateStore = options && options.async
     ? this.templatesAsync
     : this.templatesSync;
@@ -44,12 +42,7 @@ function handleCache(
   }
 }
 
-export function render<T extends object>(
-  this: Tpl,
-  template: string | TemplateFunction, // template name or template function
-  data: T,
-  meta?: { filepath: string },
-): string {
+export const render=( template: string | TemplateFunction, data: T,meta?: { filepath: string }): string => {
   let templateFn: TemplateFunction;
   const options = { ...meta, async: false };
 
@@ -68,15 +61,9 @@ export function render<T extends object>(
   return res;
 }
 
-export function renderAsync<T extends object>(
-  this: Tpl,
-  template: string | TemplateFunction, // template name or template function
-  data: T,
-  meta?: { filepath: string },
-): Promise<string> {
+export const renderAsync=(template: string | TemplateFunction, data: T,  meta?: { filepath: string }): Promise<string> {
   let templateFn: TemplateFunction;
   const options = { ...meta, async: true };
-
   if (typeof template === "string") {
     if (this.resolvePath && this.readFile && !template.startsWith("@")) {
       options.filepath = this.resolvePath(template, options);
@@ -93,21 +80,13 @@ export function renderAsync<T extends object>(
   return Promise.resolve(res);
 }
 
-export function renderString<T extends object>(
-  this: Tpl,
-  template: string,
-  data: T,
-): string {
+export function renderString(template: string, data: T): string {
   const templateFn = this.compile(template, { async: false });
 
   return render.call(this, templateFn, data);
 }
 
-export function renderStringAsync<T extends object>(
-  this: Tpl,
-  template: string,
-  data: T,
-): Promise<string> {
+export const renderStringAsync=( template: string, data: T)=> Promise<string> {
   const templateFn = this.compile(template, { async: true });
 
   return renderAsync.call(this, templateFn, data);

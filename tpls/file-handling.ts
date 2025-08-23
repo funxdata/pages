@@ -2,8 +2,9 @@ import { TplFileResolutionError } from "./err.ts";
 import * as path from "@std/path";
 
 /* TYPES */
-import type { Tpl as TplCore } from "./core.ts";
-import type { Options } from "./config.ts";
+import type { Tpl as TplCore } from "./types/core.ts";
+import type { Options } from "./types/config.ts";
+
 /* END TYPES */
 
 export function readFile(this: TplCore, abs_path: string): string {

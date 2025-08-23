@@ -1,8 +1,10 @@
 /* TYPES */
 
-import type { Options } from "./config.ts";
-import type { AstObject } from "./parse.ts";
-import type { Tpl } from "./core.ts";
+import type { Options } from "./types/config.ts";
+
+import type { AstObject } from "./types/parse.ts";
+
+import type { Tpl } from "./types/core.ts";
 
 /* END TYPES */
 

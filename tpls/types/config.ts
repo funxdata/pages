@@ -1,4 +1,4 @@
-type trimConfig = "nl" | "slurp" | false;
+export type trimConfig = "nl" | "slurp" | false;
 
 export type Options = {
   /** Compile to async function */

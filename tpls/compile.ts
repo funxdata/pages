@@ -1,4 +1,5 @@
-import type { Tpl } from "./core.ts";
+import type { Tpl } from "./types/core.ts";
+
 import type { TplConfig, Options } from "./types/config.ts";
 
 import { TplParseError } from "./err.ts";
