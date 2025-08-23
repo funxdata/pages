@@ -1,3 +1,4 @@
+import type { TplConfig, Options } from "./types/config.ts";
 import { Cacher } from "./storage.ts";
 import { compile } from "./compile.ts";
 import { compileBody, compileToString } from "./compile-string.ts";
@@ -11,9 +12,6 @@ import {
 } from "./render.ts";
 import { TplError, RuntimeErr } from "./err.ts";
 import { TemplateFunction } from "./compile.ts";
-
-/* TYPES */
-import type { TplConfig, Options } from "./config.ts";
 /* END TYPES */
 
 export class Tpl {

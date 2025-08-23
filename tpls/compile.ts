@@ -1,15 +1,7 @@
-import { TplParseError } from "./err.ts";
-
-/* TYPES */
 import type { Tpl } from "./core.ts";
-import type { TplConfig, Options } from "./config.ts";
+import type { TplConfig, Options } from "./types/config.ts";
 
-export type TemplateFunction = (
-  this: Tpl,
-  data?: object,
-  options?: Partial<Options>,
-) => string;
-/* END TYPES */
+import { TplParseError } from "./err.ts";
 
 /* istanbul ignore next */
 const AsyncFunction = async function () {}.constructor; // eslint-disable-line @typescript-eslint/no-empty-function
