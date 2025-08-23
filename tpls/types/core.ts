@@ -1,18 +1,21 @@
-import type { TplConfig, Options } from "./types/config.ts";
+import type { TplConfig, Options } from "./config.ts";
 import type { Cacher } from "./storage.ts";
 import type { TemplateFunction } from "./compile.ts";
-import type { TplError, RuntimeErr } from "./err.ts";
+import type { TplError, RuntimeErrFn } from "./err.ts";
 
-export type Tpl = {
+export interface Tpl {
   config: TplConfig;
 
   // 错误
-  RuntimeErr: typeof RuntimeErr;
+  RuntimeErr: RuntimeErrFn;
 
   // 编译相关
+  // deno-lint-ignore no-explicit-any
   compile: (template: string, options?: Partial<any>) => TemplateFunction;
+  // deno-lint-ignore no-explicit-any
   compileToString: (template: string, options?: Partial<any>) => string;
   compileBody: (buff: string) => string;
+  // deno-lint-ignore no-explicit-any
   parse: (template: string) => any;
 
   // 渲染相关
