@@ -1,4 +1,4 @@
-import type { TplConfig } from "./config.ts";
+import type  { defaultConfig} from "./config.ts";
 
 /**
  * Takes a string within a template and trims it, based on the preceding tag's whitespace control and `config.autoTrim`
@@ -6,7 +6,7 @@ import type { TplConfig } from "./config.ts";
 
 export const trimWS=(
   str: string,
-  config: TplConfig,
+  config: typeof defaultConfig,
   wsLeft: string | false,
   wsRight?: string | false,
 ): string =>{
