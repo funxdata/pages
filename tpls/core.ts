@@ -1,89 +1,101 @@
-import type { TplConfig, Options } from "./types/config.ts";
-import { Cacher } from "./storage.ts";
-import { compile } from "./compile.ts";
-import { compileBody, compileToString } from "./compile-string.ts";
+import type { Options } from "./types/config.ts";
+import type { TemplateFunction } from "./types/compile.ts";
+import type { AstObject } from "./types/parse.ts";
+
+import { TplError } from "./err.ts";
 import { defaultConfig } from "./config.ts";
+import { compile } from "./compile.ts";
+import { compileToString, compileBody } from "./compile-string.ts";
+import { Cacher } from "./storage.ts";
 import { parse } from "./parse.ts";
-import {
-  render,
-  renderAsync,
-  renderString,
-  renderStringAsync,
-} from "./render.ts";
-import { TplError, RuntimeErr } from "./err.ts";
-import { TemplateFunction } from "./compile.ts";
-/* END TYPES */
+import { render, renderString, renderAsync, renderStringAsync } from "./render.ts";
 
 export class Tpl {
+  config = defaultConfig;
+  templates = new Cacher();
+  templatesSync = new Cacher();
+  templatesAsync = new Cacher();
+  filepathCache: Record<string, string> = {};
+  TplErr = new TplError();
 
-  constructor(customConfig: Partial<TplConfig>) {
-    if (customConfig) {
-      this.config = { ...defaultConfig, ...customConfig };
-    } else {
-      this.config = { ...defaultConfig };
-    }
+  resolvePath?: (this: Tpl, template: string, options?: Partial<Options>) => string;
+  readFile?: (this: Tpl, path: string) => string;
+
+  constructor(cfg: Partial<typeof defaultConfig> = {}) {
+    this.config = { ...defaultConfig, ...cfg };
+    this.resolvePath = (template) => template;
+    this.readFile = (path) => {
+      throw new Error("readFile not implemented: " + path);
+    };
   }
 
-
-  config: TplConfig;
-
-  RuntimeErr = RuntimeErr;
-
-  compile = compile;
-  compileToString = compileToString;
-  compileBody = compileBody;
-  parse = parse;
-  render = render;
-  renderAsync = renderAsync;
-  renderString = renderString;
-  renderStringAsync = renderStringAsync;
-
-  filepathCache: Record<string, string> = {};
-  templatesSync: Cacher<TemplateFunction> = new Cacher<TemplateFunction>({});
-  templatesAsync: Cacher<TemplateFunction> = new Cacher<TemplateFunction>({});
-
-  // resolvePath takes a relative path from the "views" directory
-  resolvePath:
-    | null
-    | ((this: Tpl, template: string, options?: Partial<Options>) => string) =
-      null;
-  readFile: null | ((this: Tpl, path: string) => string) = null;
-
-  // METHODS
-
-  configure(customConfig: Partial<TplConfig>) {
+  withConfig(customConfig: Partial<typeof defaultConfig>) {
     this.config = { ...this.config, ...customConfig };
   }
 
-  withConfig(customConfig: Partial<TplConfig>): this & { config: TplConfig } {
-    return { ...this, config: { ...this.config, ...customConfig } };
-  }
-
-  loadTemplate(
+  loadTemplate<T extends Record<string, any> = Record<string, any>>(
     name: string,
-    template: string | TemplateFunction, // template string or template function
-    options?: { async: boolean },
-  ): void {
+    template: string | TemplateFunction<T>,
+    options?: { async: boolean }
+  ) {
+    const store = options?.async ? this.templatesAsync : this.templatesSync;
     if (typeof template === "string") {
-      const templates = options && options.async
-        ? this.templatesAsync
-        : this.templatesSync;
-
-      templates.define(name, this.compile(template, options));
+      store.define(name, this.compile<T>(template, options));
     } else {
-      let templates = this.templatesSync;
-
-      if (
-        template.constructor.name === "AsyncFunction" ||
-        (options && options.async)
-      ) {
-        templates = this.templatesAsync;
-      }
-
-      templates.define(name, template);
+      store.define(name, template);
     }
   }
-}
 
-// for instance checking against thrown errors
-export { TplError };
+  compile<T extends Record<string, any> = Record<string, any>>(
+    template: string,
+    options?: Partial<Options>
+  ): TemplateFunction<T> {
+    return compile<T>(this, template, options);
+  }
+
+  compileToString(template: string, options?: Partial<Options>) {
+    return compileToString.call(this, template, options);
+  }
+
+  compileBody(buffer: AstObject[]) {
+    return compileBody.call(this, buffer);
+  }
+
+  parse(template: string) {
+    return parse.call(this, template);
+  }
+
+  // deno-lint-ignore no-explicit-any
+  render<T extends Record<string, any> = Record<string, any>>(
+    template: string | TemplateFunction<T>,
+    data?: T,
+    meta?: object
+  ) {
+    return render.call(this, template, data, meta);
+  }
+
+  // deno-lint-ignore no-explicit-any
+  renderAsync<T extends Record<string, any> = Record<string, any>>(
+    template: string | TemplateFunction<T>,
+    data?: T,
+    meta?: object
+  ) {
+    return renderAsync.call(this, template, data, meta);
+  }
+
+  // deno-lint-ignore no-explicit-any
+  renderString<T extends Record<string, any> = Record<string, any>>(
+    template: string,
+    data?: T
+  ) {
+    return renderString.call(this, template, data);
+  }
+
+  // deno-lint-ignore no-explicit-any
+  renderStringAsync<T extends Record<string, any> = Record<string, any>>(
+    template: string,
+    data?: T
+  ) {
+    return renderStringAsync.call(this, template, data);
+  }
+}

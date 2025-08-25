@@ -71,10 +71,10 @@ export class Route implements RouteType {
     script.type = "module";
 
     script.onload = () => {
-        console.log(`[script] loaded: ${urlWithRand}`);
-        if (this.hook) {
-          this.hook(); // 脚本加载完成后再执行 hook
-        }
+      console.log(`[script] loaded: ${urlWithRand}`);
+      if (this.hook) {
+        this.hook(); // 脚本加载完成后再执行 hook
+      }
     };
 
     script.onerror = () => {

@@ -1,47 +1,56 @@
 import type { TplConfig, Options } from "./config.ts";
 import type { Cacher } from "./storage.ts";
 import type { TemplateFunction } from "./compile.ts";
-import type { TplError, RuntimeErrFn } from "./err.ts";
+import type { TplError } from "./err.ts";
+import type { AstObject } from "./parse.ts";
 
-export interface Tpl {
+// 完整的 Tpl 类型定义，只做类型提示
+export type Tpl = {
   config: TplConfig;
-
-  // 错误
-  RuntimeErr: RuntimeErrFn;
-
-  // 编译相关
-  // deno-lint-ignore no-explicit-any
-  compile: (template: string, options?: Partial<any>) => TemplateFunction;
-  // deno-lint-ignore no-explicit-any
-  compileToString: (template: string, options?: Partial<any>) => string;
-  compileBody: (buff: string) => string;
-  // deno-lint-ignore no-explicit-any
-  parse: (template: string) => any;
-
-  // 渲染相关
-  render: (template: string | TemplateFunction, data?: object, meta?: object) => string;
-  renderAsync: (template: string | TemplateFunction, data?: object, meta?: object) => Promise<string>;
-  renderString: (template: string, data?: object) => string;
-  renderStringAsync: (template: string, data?: object) => Promise<string>;
-
-  // 缓存
   filepathCache: Record<string, string>;
-  templatesSync: Cacher<TemplateFunction>;
-  templatesAsync: Cacher<TemplateFunction>;
+  templates: Cacher;
+  templatesSync: Cacher;
+  templatesAsync: Cacher;
+  TplErr: TplError;
 
-  // I/O 与路径
-  resolvePath: null | ((this: Tpl, template: string, options?: Partial<Options>) => string);
-  readFile: null | ((this: Tpl, path: string) => string);
+  resolvePath?: (this: Tpl, template: string, options?: Partial<Options>) => string;
+  readFile?: (this: Tpl, path: string) => string;
 
-  // 方法
-  configure(customConfig: Partial<TplConfig>): void;
-  withConfig(customConfig: Partial<TplConfig>): this & { config: TplConfig };
-  loadTemplate(
+  compile: <T extends Record<string, any> = Record<string, any>>(
+    template: string,
+    options?: Partial<Options>
+  ) => TemplateFunction<T>;
+
+  compileToString: (template: string, options?: Partial<Options>) => string;
+  compileBody: (buffer: AstObject[]) => string;
+  parse: (template: string) => AstObject[];
+
+  render: <T extends Record<string, any> = Record<string, any>>(
+    template: string | TemplateFunction<T>,
+    data?: T,
+    meta?: Partial<Options>
+  ) => string;
+
+  renderAsync: <T extends Record<string, any> = Record<string, any>>(
+    template: string | TemplateFunction<T>,
+    data?: T,
+    meta?: Partial<Options>
+  ) => Promise<string>;
+
+  renderString: <T extends Record<string, any> = Record<string, any>>(
+    template: string,
+    data?: T
+  ) => string;
+
+  renderStringAsync: <T extends Record<string, any> = Record<string, any>>(
+    template: string,
+    data?: T
+  ) => Promise<string>;
+
+  withConfig: (customConfig: Partial<TplConfig>) => void;
+  loadTemplate: (
     name: string,
     template: string | TemplateFunction,
-    options?: { async: boolean },
-  ): void;
+    options?: { async: boolean }
+  ) => void;
 };
-
-// for instanceof 检查
-export type { TplError };

@@ -1,6 +1,6 @@
 export type TagType = "r" | "e" | "i" | "";
 
-export type TemplateObject {
+export type TemplateObject = {
   t: TagType;
   val: string;
   lineNo?: number;

@@ -1,6 +1,9 @@
-import { ParseErr } from "./err.ts";
-import { trimWS } from "./utils.ts";
 import type { Tpl } from "./types/core.ts";
+import type { AstObject,TagType } from "./types/parse.ts";
+
+
+import { trimWS } from "./utils.ts";
+
 /* END TYPES */
 
 const templateLitReg =
@@ -21,7 +24,7 @@ const getLineNo=(str: string, index: number)=> {
   return str.slice(0, index).split("\n").length;
 }
 
-export const parse=(this: Tpl, str: string): Array<AstObject>=> {
+export function parse(this: Tpl, str: string): Array<AstObject> {
   const config = this.config;
 
   let buffer: Array<AstObject> = [];
@@ -144,7 +147,7 @@ export const parse=(this: Tpl, str: string): Array<AstObject>=> {
           const commentCloseInd = str.indexOf("*/", parseCloseReg.lastIndex);
 
           if (commentCloseInd === -1) {
-            ParseErr("unclosed comment", str, closeTag.index);
+            this.TplErr.TplParseError("unclosed comment", str, closeTag.index);
           }
           parseCloseReg.lastIndex = commentCloseInd;
         } else if (char === "'") {
@@ -154,7 +157,7 @@ export const parse=(this: Tpl, str: string): Array<AstObject>=> {
           if (singleQuoteMatch) {
             parseCloseReg.lastIndex = singleQuoteReg.lastIndex;
           } else {
-            ParseErr("unclosed string", str, closeTag.index);
+            this.TplErr.TplParseError("unclosed string", str, closeTag.index);
           }
         } else if (char === '"') {
           doubleQuoteReg.lastIndex = closeTag.index;
@@ -163,7 +166,7 @@ export const parse=(this: Tpl, str: string): Array<AstObject>=> {
           if (doubleQuoteMatch) {
             parseCloseReg.lastIndex = doubleQuoteReg.lastIndex;
           } else {
-            ParseErr("unclosed string", str, closeTag.index);
+            this.TplErr.TplParseError("unclosed string", str, closeTag.index);
           }
         } else if (char === "`") {
           templateLitReg.lastIndex = closeTag.index;
@@ -171,7 +174,7 @@ export const parse=(this: Tpl, str: string): Array<AstObject>=> {
           if (templateLitMatch) {
             parseCloseReg.lastIndex = templateLitReg.lastIndex;
           } else {
-            ParseErr("unclosed string", str, closeTag.index);
+            this.TplErr.TplParseError("unclosed string", str, closeTag.index);
           }
         }
       }
@@ -182,7 +185,7 @@ export const parse=(this: Tpl, str: string): Array<AstObject>=> {
       }
       buffer.push(currentObj);
     } else {
-      ParseErr("unclosed tag", str, m.index);
+      this.TplErr.TplParseError("unclosed tag", str, m.index);
     }
   }
 

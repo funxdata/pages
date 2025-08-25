@@ -1,93 +1,76 @@
-import { TplNameResolutionError } from "./err.ts";
-
-/* TYPES */
-import type { Options } from "./types/config.ts";
-
+import type { InternalOptions } from "./types/config.ts";
 import type { TemplateFunction } from "./types/compile.ts";
+import type { Tpl } from "./types/core.ts";
 
-import type { Tpl } from "./core.ts";
-/* END TYPES */
-
-const handleCache=( template: string,options: Partial<Options>): TemplateFunction =>{
-  const templateStore = options && options.async
-    ? this.templatesAsync
-    : this.templatesSync;
+function handleCache<T>(
+  this: Tpl,
+  template: string,
+  options: InternalOptions,
+): TemplateFunction<T> {
+  const store = options.async ? this.templatesAsync : this.templatesSync;
 
   if (this.resolvePath && this.readFile && !template.startsWith("@")) {
-    const templatePath = options.filepath as string;
+    const filepath = this.resolvePath(template, options);
+    options.filepath = filepath;
 
-    const cachedTemplate = templateStore.get(templatePath);
+    const cached = store?.get(filepath);
+    if (this.config.cache && cached) return cached;
 
-    if (this.config.cache && cachedTemplate) {
-      return cachedTemplate;
-    } else {
-      const templateString = this.readFile(templatePath);
-
-      const templateFn = this.compile(templateString, options);
-
-      if (this.config.cache) templateStore.define(templatePath, templateFn);
-
-      return templateFn;
-    }
-  } else {
-    const cachedTemplate = templateStore.get(template);
-
-    if (cachedTemplate) {
-      return cachedTemplate;
-    } else {
-      throw new TplNameResolutionError(
-        "Failed to get template '" + template + "'",
-      );
-    }
-  }
-}
-
-export const render=( template: string | TemplateFunction, data: T,meta?: { filepath: string }): string => {
-  let templateFn: TemplateFunction;
-  const options = { ...meta, async: false };
-
-  if (typeof template === "string") {
-    if (this.resolvePath && this.readFile && !template.startsWith("@")) {
-      options.filepath = this.resolvePath(template, options);
-    }
-
-    templateFn = handleCache.call(this, template, options);
-  } else {
-    templateFn = template;
+    const tplStr = this.readFile(filepath);
+    const tplFn = this.compile<T>(tplStr, options);
+    if (this.config.cache) store?.define(filepath, tplFn);
+    return tplFn;
   }
 
-  const res = templateFn.call(this, data, options);
+  const cached = store?.get(template);
+  if (cached) return cached;
 
-  return res;
+  this.TplErr.TplNameResolutionError(`Failed to get template '${template}'`);
+  throw new Error(`Template not found: ${template}`);
 }
 
-export const renderAsync=(template: string | TemplateFunction, data: T,  meta?: { filepath: string }): Promise<string> {
-  let templateFn: TemplateFunction;
-  const options = { ...meta, async: true };
-  if (typeof template === "string") {
-    if (this.resolvePath && this.readFile && !template.startsWith("@")) {
-      options.filepath = this.resolvePath(template, options);
-    }
+export function render<T = Record<string, any>>(
+  this: Tpl,
+  template: string | TemplateFunction<T>,
+  data: T = {} as T,
+  meta?: InternalOptions,
+): string {
+  const options: InternalOptions = { ...meta, async: false };
+  const tplFn = typeof template === "string"
+    ? handleCache.call(this, template, options)
+    : template;
 
-    templateFn = handleCache.call(this, template, options);
-  } else {
-    templateFn = template;
-  }
-
-  const res = templateFn.call(this, data, options);
-
-  // Return a promise
-  return Promise.resolve(res);
+  return tplFn.call(this, data, options); // TS 不再报错
 }
 
-export function renderString(template: string, data: T): string {
-  const templateFn = this.compile(template, { async: false });
+export function renderAsync<T = Record<string, any>>(
+  this: Tpl,
+  template: string | TemplateFunction<T>,
+  data: T = {} as T,
+  meta?: InternalOptions,
+): Promise<string> {
+  const options: InternalOptions = { ...meta, async: true };
+  const tplFn = typeof template === "string"
+    ? handleCache.call(this, template, options)
+    : template;
 
-  return render.call(this, templateFn, data);
+  return Promise.resolve(tplFn.call(this, data, options));
 }
 
-export const renderStringAsync=( template: string, data: T)=> Promise<string> {
-  const templateFn = this.compile(template, { async: true });
+export function renderString<T = Record<string, any>>(
+  this: Tpl,
+  template: string,
+  data: T = {} as T,
+): string {
+  const tplFn = this.compile<T>(template, { async: false });
+  return tplFn.call(this, data, { async: false });
+}
 
-  return renderAsync.call(this, templateFn, data);
+export function renderStringAsync<T = Record<string, any>>(
+  this: Tpl,
+  template: string,
+  data: T = {} as T,
+): Promise<string> {
+  const tplFn = this.compile<T>(template, { async: true });
+  return Promise.resolve(tplFn.call(this, data, { async: true }));
 }

@@ -8,6 +8,9 @@ export type Options = {
   filepath?: string;
 }
 
+// 扩展 Options，加上内部使用的 filepath
+export type InternalOptions = Partial<Options> & { filepath?: string };
+
 export type TplConfig = {
   /** Whether or not to automatically XML-escape interpolations. Default true */
   autoEscape: boolean;

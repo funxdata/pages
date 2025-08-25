@@ -1,19 +1,24 @@
-
-export class Cacher<T> {
-  constructor(private cache: Record<string, T>) {}
-  define(key: string, val: T): void {
-    this.cache[key] = val;
-  }
-  get(key: string): T {
-    return this.cache[key];
-  }
-  remove(key: string): void {
-    delete this.cache[key];
-  }
-  reset(): void {
+import type { Cacher as CacherType,CacheObj} from "./types/storage.ts"
+export class Cacher implements CacherType {
+  cache: CacheObj;
+  constructor() {
     this.cache = {};
   }
-  load(cacheObj: Record<string, T>): void {
+  // deno-lint-ignore no-explicit-any
+  define(key: string, val: any){
+    this.cache[key] = val;
+  }
+  // deno-lint-ignore no-explicit-any
+  get(key: string): any {
+    return this.cache[key];
+  }
+  remove(key: string) {
+    delete this.cache[key];
+  }
+  reset(){
+    this.cache = {};
+  }
+  load(cacheObj: CacheObj) {
     this.cache = { ...this.cache, ...cacheObj };
   }
 }

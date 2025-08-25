@@ -1,10 +1,12 @@
-export type CacheObj = Record<string, any>;
+import type { TemplateFunction } from "./compile.ts";
 
-// 泛型 T 表示缓存值的类型
-export type Cacher<T = any>= {
-  define(key: string, val: T): void;
-  get(key: string): T | undefined;
-  remove(key: string): void;
-  reset(): void;
-  load(cacheObj: CacheObj): void;
-}
+export type CacheObj = { [key: string]: any };
+
+export type Cacher<T = TemplateFunction> = {
+  cache: CacheObj;
+  define: (key: string, val: T) => void;
+  get: (key: string) => T | undefined;
+  remove: (key: string) => void;
+  reset: () => void;
+  load: (cacheObj: CacheObj) => void;
+};

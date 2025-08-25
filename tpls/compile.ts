@@ -1,52 +1,40 @@
 import type { Tpl } from "./types/core.ts";
-
 import type { TplConfig, Options } from "./types/config.ts";
-
-import { TplParseError } from "./err.ts";
+import type { TemplateFunction,compile as CompileFunction } from "./types/compile.ts";
 
 /* istanbul ignore next */
 const AsyncFunction = async function () {}.constructor; // eslint-disable-line @typescript-eslint/no-empty-function
 
-/**
- * Takes a template string and returns a template function that can be called with (data, config)
- *
- * @param str - The template string
- * @param config - A custom configuration object (optional)
- */
-
-export function compile(
-  this: Tpl,
+export const compile: CompileFunction = <T extends Record<string, any> = Record<string, any>>(
+  tpl: Tpl,
   str: string,
-  options?: Partial<Options>,
-): TemplateFunction {
-  const config: TplConfig = this.config;
+  options?: Partial<Options>
+): TemplateFunction<T> => {
+  const config: TplConfig = tpl.config;
 
-  /* ASYNC HANDLING */
-  // code gratefully taken from https://github.com/mde/ejs and adapted
   const ctor = options && options.async
     ? (AsyncFunction as FunctionConstructor)
     : Function;
-  /* END ASYNC HANDLING */
 
   try {
     return new ctor(
       config.varName,
       "options",
-      this.compileToString.call(this, str, options),
-    ) as TemplateFunction; // eslint-disable-line no-new-func
+      tpl.compileToString.call(tpl, str, options)
+    ) as TemplateFunction<T>; // 保持 TS 泛型
   } catch (e) {
     if (e instanceof SyntaxError) {
-      throw new TplParseError(
+      throw tpl.TplErr.TplNameResolutionError(
         "Bad template syntax\n\n" +
-          e.message +
-          "\n" +
-          Array(e.message.length + 1).join("=") +
-          "\n" +
-          this.compileToString.call(this, str, options) +
-          "\n", // This will put an extra newline before the callstack for extra readability
+        e.message +
+        "\n" +
+        Array(e.message.length + 1).join("=") +
+        "\n" +
+        tpl.compileToString.call(tpl, str, options) +
+        "\n"
       );
     } else {
       throw e;
     }
   }
-}
+};

@@ -1,7 +1,7 @@
 import type { TplConfig } from "./types/config.ts";
 import { XMLEscape } from "./utils.ts";
 
-const defaultConfig: TplConfig = {
+export const defaultConfig: TplConfig = {
   autoEscape: true,
   autoFilter: false,
   autoTrim: [false, "nl"],
@@ -24,5 +24,3 @@ const defaultConfig: TplConfig = {
   varName: "it",
   defaultExtension: ".tpl",
 };
-
-export { defaultConfig };
