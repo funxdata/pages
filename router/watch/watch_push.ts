@@ -1,10 +1,25 @@
-//  监听页面的替换变化
-// PushState 主要针对于页面只改变地址,并记录历史记录地址
-import type { PagesRouterInfo,HistoryStateArgs } from "@/types/router.ts";
+import type { PagesRouterInfo, HistoryStateArgs } from "@/types/router.ts";
 
-export const WatchPushState = (router: PagesRouterInfo,evt:HistoryStateArgs) => {
-    if(evt[0]!=null&&evt[0].sys){
-        return;
-    }
-    router.replace(evt[2] as string);
+// 定义一个全局定时器
+let pushStateTimer: number | undefined;
+
+/**
+ * 防抖版 PushState 监听
+ */
+export const WatchPushState = (router: PagesRouterInfo, evt: HistoryStateArgs) => {
+  if (evt[0] != null && evt[0].sys) {
+    return;
+  }
+
+  const href = evt[2] as string;
+
+  // 清除上一次定时器
+  if (pushStateTimer) {
+    clearTimeout(pushStateTimer);
+  }
+
+  // 设置新的定时器（防抖：200ms 内只触发最后一次）
+  pushStateTimer = globalThis.window.setTimeout(() => {
+    router.replace(href);
+  }, 200);
 };
