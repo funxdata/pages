@@ -1,0 +1,37 @@
+ [
+  {
+    "title":"about",
+    "child":[
+        {
+            "path":"/about",
+            "url":"/example/rout/screenshader.ts",
+            "title":"about"
+        }
+    ]
+   },
+   {
+   "title":"route",
+   "child":[
+        {
+            "path":"/router",
+            "url":"/src/router.ts",
+            "title":"route info"
+        }
+
+   ]
+   },
+   {
+   "title":"tpls",
+   "child":[
+        {
+            "path":"/tpls",
+            "url":"/src/tpls.ts",
+            "title":"tpls"
+        }
+   ]
+   }
+
+ ]
+ 
+
+        
