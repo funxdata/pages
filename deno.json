@@ -20,7 +20,7 @@
     ],
     "tasks": {
         "view": "deno run --allow-sys --allow-net --allow-read  --allow-run --allow-env --allow-ffi  --allow-write  jsr:@funxdata/toolkit/view",
-        "pack":"deno run --allow-net --allow-read --allow-write --allow-env --allow-ffi --allow-run jsr:@funxdata/toolkit/pack",
+        "pack":"deno run --allow-sys --allow-net --allow-read --allow-write --allow-env --allow-ffi --allow-run jsr:@funxdata/toolkit/pack",
         "release":"deno run --allow-net --allow-read  --allow-run --allow-ffi --allow-env --allow-sys jsr:@funxdata/toolkit/release"
     },
     "imports": {
