@@ -137,3 +137,4 @@ dist
 deno.lock
 ./deno.lock
 html
+publish*
