@@ -1,6 +1,7 @@
 import type { InternalOptions } from "./config.ts"
 import type { TemplateFunction } from "./compile.ts"
-export type TplRender = {
+
+export interface TplRender {
   // 同步渲染
   render: (
     template: string | TemplateFunction,

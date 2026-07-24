@@ -1,4 +1,4 @@
-import { TplError as TplErrorType } from "./types/err.ts"
+import type { TplError as TplErrorType } from "./types/err.ts"
 export class TplError extends Error implements TplErrorType {
   override cause?: unknown;
 

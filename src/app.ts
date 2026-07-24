@@ -1,26 +1,35 @@
-import type { Tpl } from "@/types/tpls.ts"
+import type {PagesRouterInfo,Route} from "@/router/types.ts"
+import type { Tpl } from "@/tpls/types.ts";
+import { get_router_info } from "@/src/apis/route.ts"
+import { main_tpl } from "./views/main.ts"
+import { menu_tpl } from "./views/menu.ts"
+
 // deno-lint-ignore no-explicit-any
 const TplToHtml = (globalThis as any)["TplToHtml"] as Tpl;
 
-const App = document.getElementById("app") as HTMLElement;
-// 1. 编译并注册模板
-const header_html = `
-<header>
+// deno-lint-ignore no-explicit-any}
+const GlobalPagesRoute = (globalThis as any)["GlobalPagesRouter"] as PagesRouterInfo;
+const req_routerData = await get_router_info();
+const routerinfo = req_routerData.data as Route[];
 
-<div><%= it.title %></div>
+for (let index = 0; index < routerinfo.length; index++) {
+    const allinfo = routerinfo[index];
+    for (let j = 0; j < allinfo.child.length; j++) {
+        const element = allinfo.child[j];
+        const rout = GlobalPagesRouter.on(element.path,element.title);
+        if(element.url!=""){
+            if(rout!=null){
+                rout.loadjs =  element.url
+            }
+        }
+    }
+}
 
-</header>
-`
-TplToHtml.loadTemplate("header", TplToHtml.compile!(header_html));
-TplToHtml.loadTemplate("footer", TplToHtml.compile!("<footer>© <%= it.year %></footer>"));
+// GlobalPagesRouter.replace("/");
+// init_header();
+const app_main = document.getElementById("app") as HTMLElement;
+app_main.innerHTML = main_tpl;
 
-// console.log(TplToHtml.templates)
-// const aa = TplToHtml.templates?.get("header")
-// console.log(aa);
-// // 2. 渲染模板
-const result = await TplToHtml.renderStringAsync(
-  "<%~ include('header', it) %><p><%= it.hello %></p><%~ include('footer', it) %><% console.log('hello world') %> ",
-  { title: "My Site", year: 2025,hello:"hello world" }
-);
-console.log(result)
-App.innerHTML = result;
+const app_navtabs = app_main.querySelector("#asides") as HTMLElement;
+app_navtabs.innerHTML = await TplToHtml.renderString(menu_tpl,{"tabledata":routerinfo});
+

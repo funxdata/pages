@@ -1,4 +1,3 @@
-
 export type paginationcfg = {
     size:number,    // 分页数量
     num:number,     // 当前页码

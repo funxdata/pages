@@ -5,7 +5,7 @@ import type { TplError } from "./err.ts";
 import type { AstObject } from "./parse.ts";
 
 // 完整的 Tpl 类型定义，只做类型提示
-export type Tpl = {
+export interface Tpl {
   config: TplConfig;
   filepathCache: Record<string, string>;
   templates: Cacher;
