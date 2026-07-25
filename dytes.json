@@ -6,6 +6,7 @@
   "author": "funxdata",
   "type": "web",
   "exports": {
-    "./assets/pages_browser_0_0_26.js": "browser.js"
+    "./assets/browser.js": "browser.js",
+    "./assets/router.js": "router.js"
   }
 }
