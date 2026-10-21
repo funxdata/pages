@@ -1,42 +1,70 @@
-import { HistoryStateArgs } from "@/types/router.ts"
-import { PagesRouter } from  "./core.ts"
-import { WatchClickLink } from "./watch/watch_click.ts"
-import { WatchPopState } from "./watch/watch_pop.ts"
-import { WatchPushState } from "./watch/watch_push.ts"
-import { WatchReplace } from "./watch/watch_replace.ts"
-// // 初始化并挂载到globalThis
-// deno-lint-ignore no-explicit-any
-declare const globalThis:any
-const GlobalPagesRouter = new PagesRouter();
+import type { PagesRouterInfo, HistoryStateArgs } from "@/types/router.ts";
+import { PagesRouter } from "./core.ts";
+import { WatchClickLink } from "./watch/watch_click.ts";
+import { WatchPopState } from "./watch/watch_pop.ts";
+import { WatchPushState } from "./watch/watch_push.ts";
+import { WatchReplace } from "./watch/watch_replace.ts";
+
+// 初始化并挂载到 globalThis
+declare const globalThis: any;
+
+export const GlobalPagesRouter = new PagesRouter();
 globalThis.GlobalPagesRouter = GlobalPagesRouter;
 
-// 监听所有页面跳转事件
-globalThis.addEventListener("click", (event: MouseEvent) => {
-  const target = event.target;
-  if (!(target instanceof Element)) return;  // 先判断 target 是 Element 类型
-  const anchor = target.closest('a');
-  if (!anchor || !anchor.href) return;
-  event.preventDefault();
-  WatchClickLink(globalThis.GlobalPagesRouter,event)
-});
+export type Cleanup = () => void;
 
-const rawPushState = history.pushState;
-const rawReplaceState = history.replaceState
-// 使用 function 而不是箭头函数，这样 arguments 是当前函数的
-history.pushState = function (state: any, title: string, url?: string | URL | null): void {
-  const result = rawPushState.apply(this, arguments as unknown as HistoryStateArgs);
-  WatchPushState(globalThis.GlobalPagesRouter,arguments  as unknown as HistoryStateArgs)
-  return result;
+let cleanup: Cleanup | null = null;
+
+/**
+ * 安装全局监听（点击、pushState、replaceState、popstate）。
+ * 重复调用返回同一个清理函数。
+ */
+export const install = (router: PagesRouterInfo = GlobalPagesRouter): Cleanup => {
+  if (cleanup) return cleanup;
+
+  const onClick = (event: MouseEvent) => WatchClickLink(router, event);
+  const onPopState = (event: PopStateEvent) => WatchPopState(router, event);
+
+  const rawPushState = history.pushState;
+  const rawReplaceState = history.replaceState;
+
+  const pushState = function (
+    this: History,
+    ...args: Parameters<History["pushState"]>
+  ) {
+    const result = rawPushState.apply(this, args);
+    WatchPushState(router, args as unknown as HistoryStateArgs);
+    return result;
+  };
+
+  const replaceState = function (
+    this: History,
+    ...args: Parameters<History["replaceState"]>
+  ) {
+    const result = rawReplaceState.apply(this, args);
+    WatchReplace(router, args as unknown as HistoryStateArgs);
+    return result;
+  };
+
+  history.pushState = pushState;
+  history.replaceState = replaceState;
+  globalThis.addEventListener("click", onClick);
+  globalThis.addEventListener("popstate", onPopState);
+
+  cleanup = () => {
+    globalThis.removeEventListener("click", onClick);
+    globalThis.removeEventListener("popstate", onPopState);
+    history.pushState = rawPushState;
+    history.replaceState = rawReplaceState;
+  };
+
+  return cleanup;
 };
 
-// deno-lint-ignore no-explicit-any
-history.replaceState = function (state: any,title: string, url?: string | URL | null): void {
-  const result = rawReplaceState.apply(this, arguments as unknown as HistoryStateArgs);
-  WatchReplace(globalThis.GlobalPagesRouter,arguments as unknown as HistoryStateArgs)
-  return result;
+/** 卸载全局监听，便于嵌入宿主或测试 */
+export const uninstall = (): void => {
+  cleanup?.();
+  cleanup = null;
 };
-// 
-globalThis.addEventListener("popstate",  (event:PopStateEvent)=> {
-  // fireChangeEvent("popstate", event.state, true);
-  WatchPopState(globalThis.GlobalPagesRouter,event);
-});
+
+install();

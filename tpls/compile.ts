@@ -24,7 +24,7 @@ export const compile: CompileFunction = <T extends Record<string, any> = Record<
     ) as TemplateFunction<T>; // 保持 TS 泛型
   } catch (e) {
     if (e instanceof SyntaxError) {
-      throw tpl.TplErr.TplNameResolutionError(
+      return tpl.TplErr.TplNameResolutionError(
         "Bad template syntax\n\n" +
         e.message +
         "\n" +

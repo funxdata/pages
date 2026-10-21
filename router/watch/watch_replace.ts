@@ -22,6 +22,6 @@ export const WatchReplace = (router: PagesRouterInfo, evt: HistoryStateArgs) => 
 
   // 设置新的定时器（防抖：200ms 内只触发最后一次）
   replaceStateTimer = globalThis.window.setTimeout(() => {
-    router.loading(href);
+    void router.loading(href);
   }, 200);
 };

@@ -15,6 +15,6 @@ export const WatchPopState = (router: PagesRouterInfo,evt:PopStateEvent) => {
   // 设置新的防抖定时器 (比如 200ms 内只触发一次)
   popStateTimer = globalThis.window.setTimeout(() => {
     console.log("PopState evt", target);
-    router.loading(href);
+    void router.loading(href);
   }, 200);
 };

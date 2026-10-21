@@ -1,35 +1,70 @@
-import type {PagesRouterInfo,Route} from "@/router/types.ts"
-import type { Tpl } from "@/tpls/types.ts";
-import { get_router_info } from "@/src/apis/route.ts"
-import { main_tpl } from "./views/main.ts"
-import { menu_tpl } from "./views/menu.ts"
+import type { PagesRouterInfo } from "@/types/router.ts";
+import type { Tpl } from "@/types/tpls.ts";
+import { get_router_info } from "@/src/apis/route.ts";
+import { main_tpl } from "./views/main.ts";
+import { menu_tpl } from "./views/menu.ts";
 
-// deno-lint-ignore no-explicit-any
-const TplToHtml = (globalThis as any)["TplToHtml"] as Tpl;
+const TplToHtml = (globalThis as { TplToHtml?: Tpl }).TplToHtml;
+const GlobalPagesRouter = (globalThis as { GlobalPagesRouter?: PagesRouterInfo })
+  .GlobalPagesRouter;
 
-// deno-lint-ignore no-explicit-any}
-const GlobalPagesRoute = (globalThis as any)["GlobalPagesRouter"] as PagesRouterInfo;
-const req_routerData = await get_router_info();
-const routerinfo = req_routerData.data as Route[];
-
-for (let index = 0; index < routerinfo.length; index++) {
-    const allinfo = routerinfo[index];
-    for (let j = 0; j < allinfo.child.length; j++) {
-        const element = allinfo.child[j];
-        const rout = GlobalPagesRouter.on(element.path,element.title);
-        if(element.url!=""){
-            if(rout!=null){
-                rout.loadjs =  element.url
-            }
-        }
-    }
+if (!TplToHtml) {
+  throw new Error(
+    "TplToHtml is not available: load /tpls/browser.ts before /src/app.ts",
+  );
+}
+if (!GlobalPagesRouter) {
+  throw new Error(
+    "GlobalPagesRouter is not available: load /router/router.ts before /src/app.ts",
+  );
 }
 
-// GlobalPagesRouter.replace("/");
-// init_header();
+const response = await get_router_info();
+const routerinfo = response.data ?? [];
+
+for (const group of routerinfo) {
+  for (const item of group.child) {
+    const route = GlobalPagesRouter.on(item.path, item.title);
+    if (route && item.url) {
+      route.loadjs = item.url;
+    }
+  }
+}
+
 const app_main = document.getElementById("app") as HTMLElement;
 app_main.innerHTML = main_tpl;
 
 const app_navtabs = app_main.querySelector("#asides") as HTMLElement;
-app_navtabs.innerHTML = await TplToHtml.renderString(menu_tpl,{"tabledata":routerinfo});
+app_navtabs.innerHTML = await TplToHtml.renderString(menu_tpl, {
+  tabledata: routerinfo,
+});
 
+// 未匹配路由时在内容区展示 404，而不是停留在旧页面
+GlobalPagesRouter.config.onNotFound = (url) => {
+  const showmain = document.getElementById("showmain");
+  if (!showmain) return;
+  showmain.innerHTML = `
+    <div class="NotFound">
+      <h2>404</h2>
+      <p>页面不存在：${escapeHtml(url)}</p>
+      <p><a href="/">返回首页</a></p>
+    </div>
+  `;
+};
+
+// 完成路由注册后执行首次导航
+GlobalPagesRouter.init();
+
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>"']/g,
+    (char) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[char]!,
+  );
+}

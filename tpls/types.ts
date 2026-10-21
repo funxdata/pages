@@ -1,4 +1,2 @@
-import type { Tpl as TplClass } from "./types/core.ts";
-
-// 使用 InstanceType 获取类实例类型
-export type Tpl = TplClass;
+// 兼容入口：模板类型统一维护在 tpls/types/core.ts
+export type { Tpl } from "./types/core.ts";

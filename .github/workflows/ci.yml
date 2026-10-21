@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type check
+        run: deno check router/router.ts router/core.ts tpls/browser.ts tpls/index.ts src/app.ts src/router.ts src/tpls.ts
+
+      - name: Test
+        run: deno test --allow-read test/

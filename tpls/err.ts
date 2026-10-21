@@ -1,4 +1,5 @@
-import type { TplError as TplErrorType } from "./types/err.ts"
+import type { TplError as TplErrorType } from "./types/err.ts";
+
 export class TplError extends Error implements TplErrorType {
   override cause?: unknown;
 
@@ -8,36 +9,30 @@ export class TplError extends Error implements TplErrorType {
     Object.setPrototypeOf(this, new.target.prototype); // 继承链修复
   }
 
-  // ============ 实例方法（链式）===========
+  // ============ 实例方法（抛出专用错误）============
 
-  TplParseError(msg: string): this {
-    this.name = "TplParseError";
-    this.message = msg;
-    this.ParseError();
-    return this;
-  }
-
-  TplRuntimeError(msg: string): this {
-    this.name = "TplRuntimeError";
-    this.message = msg;
-    this.ParseError();
-    return this;
-  }
-
-  TplNameResolutionError(msg: string): this {
-    this.name = "TplNameResolutionError";
-    this.message = msg;
-    this.ParseError();
-    return this;
-  }
-
-  private ParseError() {
-    if ((Error as any).captureStackTrace) {
-      (Error as any).captureStackTrace(this, this.constructor);
+  TplParseError(msg: string, str?: string, index?: number): never {
+    if (str !== undefined && index !== undefined) {
+      TplError.ParseError(msg, str, index);
     }
+    const err = new TplError(msg);
+    err.name = "TplParseError";
+    throw err;
   }
 
-  // ============ 工厂方法（静态）===========
+  TplRuntimeError(msg: string): never {
+    const err = new TplError(msg);
+    err.name = "TplRuntimeError";
+    throw err;
+  }
+
+  TplNameResolutionError(msg: string): never {
+    const err = new TplError(msg);
+    err.name = "TplNameResolutionError";
+    throw err;
+  }
+
+  // ============ 工厂方法（静态）============
 
   static ParseError(message: string, str: string, indx: number): never {
     const whitespace = str.slice(0, indx).split(/\n/);
@@ -103,5 +98,3 @@ export class TplError extends Error implements TplErrorType {
     console.warn(`[${this.name}] ${this.message}`);
   }
 }
-
-

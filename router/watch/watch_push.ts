@@ -20,6 +20,6 @@ export const WatchPushState = (router: PagesRouterInfo, evt: HistoryStateArgs) =
 
   // 设置新的定时器（防抖：200ms 内只触发最后一次）
   pushStateTimer = globalThis.window.setTimeout(() => {
-    router.replace(href);
+    void router.replace(href);
   }, 200);
 };

@@ -23,16 +23,13 @@ export class Tpl {
 
   constructor(cfg: Partial<typeof defaultConfig> = {}) {
     this.config = { ...defaultConfig, ...cfg };
-    this.resolvePath = (template) => template;
-    this.readFile = (path) => {
-      throw new Error("readFile not implemented: " + path);
-    };
   }
 
   withConfig(customConfig: Partial<typeof defaultConfig>) {
     this.config = { ...this.config, ...customConfig };
   }
 
+  // deno-lint-ignore no-explicit-any
   loadTemplate<T extends Record<string, any> = Record<string, any>>(
     name: string,
     template: string | TemplateFunction<T>,
@@ -46,6 +43,7 @@ export class Tpl {
     }
   }
 
+  // deno-lint-ignore no-explicit-any
   compile<T extends Record<string, any> = Record<string, any>>(
     template: string,
     options?: Partial<Options>
@@ -65,13 +63,28 @@ export class Tpl {
     return parse.call(this, template);
   }
 
+  /** 由 debug 模式生成的模板代码调用，统一抛出带上下文的运行时错误 */
+  RuntimeErr(
+    originalError: Error,
+    templateStr: string,
+    lineNo: number,
+    filepath?: string
+  ): never {
+    return TplError.RuntimeError(originalError, templateStr, lineNo, filepath);
+  }
+
   // deno-lint-ignore no-explicit-any
   render<T extends Record<string, any> = Record<string, any>>(
     template: string | TemplateFunction<T>,
     data?: T,
     meta?: object
   ) {
-    return render.call(this, template, data, meta);
+    return render.call(
+      this,
+      template as unknown as string | TemplateFunction,
+      data as Record<string, any>,
+      meta
+    );
   }
 
   // deno-lint-ignore no-explicit-any
@@ -80,7 +93,12 @@ export class Tpl {
     data?: T,
     meta?: object
   ) {
-    return renderAsync.call(this, template, data, meta);
+    return renderAsync.call(
+      this,
+      template as unknown as string | TemplateFunction,
+      data as Record<string, any>,
+      meta
+    );
   }
 
   // deno-lint-ignore no-explicit-any

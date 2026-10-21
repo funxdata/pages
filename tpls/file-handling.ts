@@ -1,7 +1,8 @@
-import { TplFileResolutionError } from "./err.ts";
+import { TplError } from "./err.ts";
 import * as path from "@std/path";
 
 /* TYPES */
+
 import type { Tpl as TplCore } from "./types/core.ts";
 import type { Options } from "./types/config.ts";
 
@@ -13,10 +14,10 @@ export function readFile(this: TplCore, abs_path: string): string {
     const res = Deno.readFileSync(abs_path);
     text = new TextDecoder().decode(res);
 
-  // deno-lint-ignore no-explicit-any
+    // deno-lint-ignore no-explicit-any
   } catch (err: any) {
-    if (err?.code === "ENOENT") {
-      throw new TplFileResolutionError(abs_path);
+    if (err instanceof Deno.errors.NotFound || err?.code === "ENOENT") {
+      TplError.FileResolutionError(abs_path);
     } else {
       throw err;
     }
@@ -35,7 +36,7 @@ export function resolvePath(
   const views = this.config.views;
 
   if (!views) {
-    throw new TplFileResolutionError("Views directory is not defined");
+    throw new TplError("Views directory is not defined");
   }
 
   const baseFilePath = options && options.filepath;
@@ -80,15 +81,17 @@ export function resolvePath(
 
     return resolvedFilePath;
   } else {
-    throw new TplFileResolutionError(
+    const err = new TplError(
       `Template '${templatePath}' is not in the views directory`,
     );
+    err.name = "TplFileResolutionError";
+    throw err;
   }
 }
 
-const dirIsChild=(parent: string, dir: string)=> {
+const dirIsChild = (parent: string, dir: string) => {
   const relative = path.relative(parent, dir);
   return relative && !relative.startsWith("..") && !path.isAbsolute(relative);
-}
+};
 
 const absolutePathRegExp = /^\\|^\//;
