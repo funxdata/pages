@@ -49,3 +49,4 @@ jobs:
         uses: dytescn/dytes@v0.1.9
         with:
           command: publish
+          args: --force
