@@ -1,13 +1,16 @@
 {
   "name": "pages",
   "uuid": "84affd48-50de-4850-ac51-c6eee2d30f35",
-  "version": "0.0.38",
+  "version": "1.0.1",
   "description": "pages for html render",
-  "keywords": ["pages","html"],
+  "keywords": [
+    "pages",
+    "html"
+  ],
   "author": "funxdata",
   "type": "web",
   "exports": {
-    "./assets/browser.js": "browser.js",
-    "./assets/router.js": "router.js"
+    "./assets/pages_browser_1_0_1.js": "browser.js",
+    "./assets/pages_router_1_0_1.js": "router.js"
   }
 }

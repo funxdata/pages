@@ -1,17 +1,17 @@
 {
     "name": "@funxdata/pages",
-    "version": "0.0.38",
+    "version": "1.0.1",
     "license": "MIT",
     "nodeModulesDir": "auto",
     "exports": {
-        "./router":"./router/core.ts",
-        "./router/browser":"./router/router.ts",
-        "./tpls":"./tpls/index.ts",
-        "./tpls/browser":"./tpls/browser.ts",
-        "./tools":"./tools/index.ts",
-        "./tplstype":"./types/tpls.ts",
-        "./routtype":"./types/router.ts",
-        "./toolstype":"./types/tools.ts"
+        "./router": "./router/core.ts",
+        "./router/browser": "./router/router.ts",
+        "./tpls": "./tpls/index.ts",
+        "./tpls/browser": "./tpls/browser.ts",
+        "./tools": "./tools/index.ts",
+        "./tplstype": "./types/tpls.ts",
+        "./routtype": "./types/router.ts",
+        "./toolstype": "./types/tools.ts"
     },
     "exclude": [
         ".github",
@@ -22,8 +22,8 @@
     ],
     "tasks": {
         "view": "deno run --allow-sys --allow-net --allow-read  --allow-run --allow-env --allow-ffi  --allow-write  jsr:@funxdata/toolkit/view",
-        "pack":"deno run --allow-net --allow-read --allow-write --allow-env --allow-ffi --allow-run --allow-sys jsr:@funxdata/toolkit/pack",
-        "release":"deno run --allow-net --allow-read  --allow-run --allow-ffi --allow-env --allow-sys jsr:@funxdata/toolkit/release"
+        "pack": "deno run --allow-net --allow-read --allow-write --allow-env --allow-ffi --allow-run --allow-sys jsr:@funxdata/toolkit/pack",
+        "release": "deno run --allow-net --allow-read  --allow-run --allow-ffi --allow-env --allow-sys jsr:@funxdata/toolkit/release"
     },
     "imports": {
         "@/": "./",
@@ -35,6 +35,11 @@
         "tailwindcss": "npm:tailwindcss@^4.2.2"
     },
     "compilerOptions": {
-        "lib": ["dom", "esnext","deno.ns", "deno.unstable"]
+        "lib": [
+            "dom",
+            "esnext",
+            "deno.ns",
+            "deno.unstable"
+        ]
     }
 }
