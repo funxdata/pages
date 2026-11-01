@@ -1,35 +1,51 @@
-name: pagesxrelease
+name: Release
 
 on:
   push:
-    branches: [main]
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  publish:
+    name: Publish JSR + S3
     runs-on: ubuntu-latest
     steps:
-      # 1
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      # 2
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
         with:
-            deno-version: v2.x
-      
-      # 3
-      - name: deno pack router
-        run: deno task pack ./router/router.ts
+          deno-version: v2.x
 
-      # 4
-      - name: deno pack views
-        run: deno task pack ./tpls/browser.ts
+      - name: Verify version
+        shell: bash
+        run: |
+          set -euo pipefail
+          deno_version=$(node -p "require('./deno.json').version")
+          dytes_version=$(node -p "require('./dytes.json').version")
+          if [ "${deno_version}" != "${dytes_version}" ]; then
+            echo "deno.json (${deno_version}) 与 dytes.json (${dytes_version}) 版本不一致" >&2
+            exit 1
+          fi
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "${deno_version}" ]; then
+            echo "tag ${GITHUB_REF_NAME} 与版本 ${deno_version} 不一致" >&2
+            exit 1
+          fi
 
-      # 5
-      - name: Upload files to Upyun
+      - name: Publish to JSR
+        run: deno publish
         env:
-          AccessKey: ${{ secrets.AccessKey }}
-          SecretAccessKey: ${{ secrets.SecretAccessKey }}
-          UPX_SERVICENAME: ${{ secrets.UPX_SERVICENAME }}
-        run: deno task release ./assets uxpages/
+          JSR_TOKEN: ${{ secrets.JSR_TOKEN }}
+
+      - name: Build assets
+        run: |
+          deno task pack ./router/router.ts
+          deno task pack ./tpls/browser.ts
+
+      - name: Publish to S3
+        uses: dytescn/dytes@v0.1.9
+        with:
+          command: publish
