@@ -38,6 +38,8 @@ jobs:
 
       - name: Publish to JSR
         run: deno publish --allow-slow-types
+        env:
+          JSR_TOKEN: ${{ secrets.JSR_TOKEN }}
 
       - name: Build assets
         run: |
