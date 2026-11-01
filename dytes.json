@@ -1,7 +1,7 @@
 {
   "name": "pages",
   "uuid": "84affd48-50de-4850-ac51-c6eee2d30f35",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "pages for html render",
   "keywords": ["pages","html"],
   "author": "funxdata",
